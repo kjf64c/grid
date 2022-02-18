@@ -84,6 +84,7 @@ stable = [
     "data-validation",
     "location",
     "pike",
+    "mfg_batch",
     "postgres",
     "product",
     "product-gdsn",
@@ -116,7 +117,6 @@ experimental = [
     "stable",
     # The following features are experimental:
     "batch-processor",
-    "mfg_batch",
     "batch-store",
     "rest-api-actix-web-3",
     "rest-api-actix-web-3-run",
