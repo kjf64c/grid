@@ -13,16 +13,16 @@
 # limitations under the License.
 
 [package]
-name = "grid-product-tp"
+name = "grid-mfg-batch-tp"
 version = "0.4.1"
 authors = ["Target Inc"]
-description = "Grid Product Smart Contract"
+description = "Grid Manufactured Batch Smart Contract"
 homepage = "https://grid.hyperledger.org"
 edition = "2018"
 
 [dependencies]
 clap = "2"
-grid-sdk = { path = "../../sdk", features = ["pike", "product", "schema"] }
+grid-sdk = { path = "../../sdk", features = ["pike", "mfg_batch", "schema"] }
 cfg-if = "1"
 hex = "0.4"
 protobuf = "2.19"
