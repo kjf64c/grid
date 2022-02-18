@@ -22,5 +22,5 @@ pub const MAX_COMMIT_NUM: i64 = i64::MAX;
 -- Link to supporting information
 -- Consider if information could extend selectively
 */
-#[cfg(feature = "product-gdsn")]
+#[cfg(feature = "mfg-batch-gdsn")] // Not a real thing...
 pub mod gdsn;

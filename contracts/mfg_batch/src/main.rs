@@ -30,7 +30,8 @@ cfg_if! {
         use log4rs::config::{Appender, Config, Root};
         use log4rs::encode::pattern::PatternEncoder;
         use sawtooth_sdk::processor::TransactionProcessor;
-        use crate::handler::ProductTransactionHandler;
+        // Load the MfgBatch transaction handler
+        use crate::handler::MfgBatchTransactionHandler;
     } else {
         #[macro_use]
         extern crate sabre_sdk;
@@ -47,7 +48,7 @@ mod validation;
 fn main() {
     let matches = clap_app!(intkey =>
         (version: crate_version!())
-        (about: "Grid Product Processor (Rust)")
+        (about: "Grid Manufactured Batch Processor (Rust)")
         (@arg connect: -C --connect +takes_value
          "connection endpoint for validator")
         (@arg verbose: -v --verbose +multiple
@@ -67,7 +68,9 @@ fn main() {
     }
 
     let stdout = ConsoleAppender::builder()
+        // Create a heap reference object
         .encoder(Box::new(PatternEncoder::new(
+            // What does this do?
             "{h({l:5.5})} | {({M}:{L}):20.20} | {m}{n}",
         )))
         .build();
@@ -84,8 +87,8 @@ fn main() {
         Ok(_) => (),
         Err(_) => process::exit(1),
     }
-
-    let handler = ProductTransactionHandler::new();
+    // Assign the batch handler to the Sabre validator
+    let handler = MfgBatchTransactionHandler::new();
     let mut processor = TransactionProcessor::new(endpoint);
 
     info!("Console logging level: {}", console_log_level);
