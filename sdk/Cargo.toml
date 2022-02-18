@@ -84,7 +84,6 @@ stable = [
     "data-validation",
     "location",
     "pike",
-    "mfg_batch",
     "postgres",
     "product",
     "product-gdsn",

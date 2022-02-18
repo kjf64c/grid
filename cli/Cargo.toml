@@ -66,7 +66,6 @@ default = [
     "pike",
     "postgres",
     "product",
-    "mfg_batch",
     "purchase-order",
     "schema",
     "sqlite",
