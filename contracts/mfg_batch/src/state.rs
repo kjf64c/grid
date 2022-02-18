@@ -24,59 +24,62 @@ cfg_if! {
 
 use grid_sdk::{
     pike::addressing::compute_organization_address,
-    product::addressing::compute_gs1_product_address,
+    // Calls the grid SDK GS1 validation routine in sdk/src/mfg_batch
+    mfg_batch::addressing::compute_gs1_mfg_batch_address,
     protocol::{
         pike::state::{Organization, OrganizationList},
-        product::state::{Product, ProductList, ProductListBuilder},
+        mfg_batch::state::{MfgBatch, MfgBatch, MfgBatchBuilder},
         schema::state::{Schema, SchemaList},
     },
     protos::{FromBytes, IntoBytes},
     schema::addressing::compute_schema_address,
 };
 
-pub struct ProductState<'a> {
+pub struct MfgBatchState<'a> {
     context: &'a dyn TransactionContext,
 }
 
-impl<'a> ProductState<'a> {
-    pub fn new(context: &'a dyn TransactionContext) -> ProductState {
-        ProductState { context }
+impl<'a> MfgBatchState<'a> {
+    pub fn new(context: &'a dyn TransactionContext) -> MfgBatchState {
+        MfgBatchState { context }
     }
 
-    pub fn get_product(&self, product_id: &str) -> Result<Option<Product>, ApplyError> {
-        let address = compute_gs1_product_address(product_id); //product id = gtin
+    pub fn get_mfg_batch(&self, mfg_batch_id: &str) -> Result<Option<MfgBatch>, ApplyError> {
+        // Calls the grid SDK GS1 validation routine in sdk/src/mfg_batch
+        let address = compute_gs1_mfg_batch_address(mfg_batch_id); //mfg_batch id = gtin
         let d = self.context.get_state_entry(&address)?;
         match d {
             Some(packed) => {
-                let products = match ProductList::from_bytes(packed.as_slice()) {
-                    Ok(products) => products,
+                let mfg_batches = match MfgBatch::from_bytes(packed.as_slice()) {
+                    Ok(mfg_batches) => mfg_batches,
                     Err(_) => {
                         return Err(ApplyError::InternalError(String::from(
-                            "Cannot deserialize product list",
+                            "Cannot deserialize mfg_batch list",
                         )));
                     }
                 };
 
-                // find the product with the correct id
-                Ok(products
-                    .products()
+                // find the mfg_batch with the correct id
+                Ok(mfg_batches
+                    .mfg_batches()
                     .iter()
-                    .find(|p| p.product_id() == product_id)
+                    .find(|p| p.mfg_batch_id() == mfg_batch_id)
                     .cloned())
             }
             None => Ok(None),
         }
     }
 
-    pub fn set_product(&self, product_id: &str, product: Product) -> Result<(), ApplyError> {
-        let address = compute_gs1_product_address(product_id);
+    pub fn set_mfg_batch(&self, mfg_batch_id: &str, mfg_batch: MfgBatch) -> Result<(), ApplyError> {
+        // Calls the grid SDK GS1 validation routine in sdk/src/mfg_batch
+        let address = compute_gs1_mfg_batch_address(mfg_batch_id);
         let d = self.context.get_state_entry(&address)?;
-        let mut products = match d {
-            Some(packed) => match ProductList::from_bytes(packed.as_slice()) {
-                Ok(product_list) => product_list.products().to_vec(),
+        let mut mfg_batches = match d {
+            Some(packed) => match MfgBatch::from_bytes(packed.as_slice()) {
+                Ok(mfg_batch_list) => mfg_batch_list.mfg_batches().to_vec(),
                 Err(err) => {
                     return Err(ApplyError::InternalError(format!(
-                        "Cannot deserialize product list: {:?}",
+                        "Cannot deserialize mfg_batch list: {:?}",
                         err
                     )));
                 }
@@ -85,30 +88,30 @@ impl<'a> ProductState<'a> {
         };
 
         let mut index = None;
-        for (i, product) in products.iter().enumerate() {
-            if product.product_id() == product_id {
+        for (i, mfg_batch) in mfg_batches.iter().enumerate() {
+            if mfg_batch.mfg_batch_id() == mfg_batch_id {
                 index = Some(i);
                 break;
             }
         }
 
         if let Some(i) = index {
-            products.remove(i);
+            mfg_batches.remove(i);
         }
-        products.push(product);
-        products.sort_by_key(|r| r.product_id().to_string());
-        let product_list = ProductListBuilder::new()
-            .with_products(products)
+        mfg_batches.push(mfg_batch);
+        mfg_batches.sort_by_key(|r| r.mfg_batch_id().to_string());
+        let mfg_batch_list = MfgBatchBuilder::new()
+            .with_mfg_batches(mfg_batches)
             .build()
             .map_err(|err| {
-                ApplyError::InvalidTransaction(format!("Cannot build product list: {:?}", err))
+                ApplyError::InvalidTransaction(format!("Cannot build mfg_batch list: {:?}", err))
             })?;
 
-        let serialized = match product_list.into_bytes() {
+        let serialized = match mfg_batch_list.into_bytes() {
             Ok(serialized) => serialized,
             Err(err) => {
                 return Err(ApplyError::InvalidTransaction(format!(
-                    "Cannot serialize product list: {:?}",
+                    "Cannot serialize mfg_batch list: {:?}",
                     err
                 )));
             }
@@ -119,16 +122,17 @@ impl<'a> ProductState<'a> {
         Ok(())
     }
 
-    // Currently product_id = gtin
-    pub fn remove_product(&self, product_id: &str) -> Result<(), ApplyError> {
-        let address = compute_gs1_product_address(product_id);
+    // Currently mfg_batch_id = gtin
+    pub fn remove_mfg_batch(&self, mfg_batch_id: &str) -> Result<(), ApplyError> {
+        // Calls the grid SDK GS1 validation routine in sdk/src/mfg_batch
+        let address = compute_gs1_mfg_batch_address(mfg_batch_id);
         let d = self.context.get_state_entry(&address)?;
-        let products = match d {
-            Some(packed) => match ProductList::from_bytes(packed.as_slice()) {
-                Ok(product_list) => product_list.products().to_vec(),
+        let mfg_batches = match d {
+            Some(packed) => match MfgBatch::from_bytes(packed.as_slice()) {
+                Ok(mfg_batch_list) => mfg_batch_list.mfg_batches().to_vec(),
                 Err(err) => {
                     return Err(ApplyError::InternalError(format!(
-                        "Cannot deserialize product list: {:?}",
+                        "Cannot deserialize mfg_batch list: {:?}",
                         err
                     )));
                 }
@@ -136,31 +140,31 @@ impl<'a> ProductState<'a> {
             None => vec![],
         };
 
-        // Filter out the product we are deleting
-        let filtered_products = products
+        // Filter out the mfg_batch we are deleting
+        let filtered_mfg_batches = mfg_batches
             .into_iter()
-            .filter(|p| p.product_id() != product_id)
+            .filter(|p| p.mfg_batch_id() != mfg_batch_id)
             .collect::<Vec<_>>();
 
-        // If the only product at the address was the one we are removing, we can delete the entire state entry
-        // Else, we can set the the filtered product list at the address
-        if filtered_products.is_empty() {
+        // If the only mfg_batch at the address was the one we are removing, we can delete the entire state entry
+        // Else, we can set the the filtered mfg_batch list at the address
+        if filtered_mfg_batches.is_empty() {
             self.context
                 .delete_state_entries(&[address])
                 .map_err(|err| ApplyError::InternalError(format!("{}", err)))?;
         } else {
-            let product_list = ProductListBuilder::new()
-                .with_products(filtered_products)
+            let mfg_batch_list = MfgBatchBuilder::new()
+                .with_mfg_batches(filtered_mfg_batches)
                 .build()
                 .map_err(|err| {
-                    ApplyError::InvalidTransaction(format!("Cannot build product list: {:?}", err))
+                    ApplyError::InvalidTransaction(format!("Cannot build mfg_batch list: {:?}", err))
                 })?;
 
-            let serialized = match product_list.into_bytes() {
+            let serialized = match mfg_batch_list.into_bytes() {
                 Ok(serialized) => serialized,
                 Err(_) => {
                     return Err(ApplyError::InternalError(String::from(
-                        "Cannot serialize product list",
+                        "Cannot serialize mfg_batch list",
                     )));
                 }
             };
@@ -233,12 +237,12 @@ mod tests {
     use std::cell::RefCell;
     use std::collections::HashMap;
 
-    use grid_sdk::protocol::product::state::{ProductBuilder, ProductNamespace};
+    use grid_sdk::protocol::mfg_batch::state::{MfgBatchBuilder, MfgBatchNamespace};
     use grid_sdk::protocol::schema::state::{DataType, PropertyValue, PropertyValueBuilder};
 
     use sawtooth_sdk::processor::handler::{ContextError, TransactionContext};
 
-    const PRODUCT_ID: &str = "688955434684";
+    const mfg_batch_ID: &str = "688955434684";
 
     #[derive(Default, Debug)]
     /// A MockTransactionContext that can be used to test TrackAndTraceState
@@ -291,41 +295,41 @@ mod tests {
     }
 
     #[test]
-    // Test that if a product does not exist in state, None is returned
-    fn test_get_product_none() {
+    // Test that if a mfg_batch does not exist in state, None is returned
+    fn test_get_mfg_batch_none() {
         let mut transaction_context = MockTransactionContext::default();
-        let state = ProductState::new(&mut transaction_context);
+        let state = MfgBatchState::new(&mut transaction_context);
 
-        let result = state.get_product("not_a_product").unwrap();
+        let result = state.get_mfg_batch("not_a_mfg_batch").unwrap();
         assert!(result.is_none())
     }
 
     #[test]
-    // Test that a product can be added to state
-    fn test_set_product() {
+    // Test that a mfg_batch can be added to state
+    fn test_set_mfg_batch() {
         let mut transaction_context = MockTransactionContext::default();
-        let state = ProductState::new(&mut transaction_context);
+        let state = MfgBatchState::new(&mut transaction_context);
 
-        assert!(state.set_product(PRODUCT_ID, make_product()).is_ok());
-        let result = state.get_product(PRODUCT_ID).unwrap();
-        assert_eq!(result, Some(make_product()));
+        assert!(state.set_mfg_batch(mfg_batch_ID, make_mfg_batch()).is_ok());
+        let result = state.get_mfg_batch(mfg_batch_ID).unwrap();
+        assert_eq!(result, Some(make_mfg_batch()));
     }
 
-    fn make_product() -> Product {
-        ProductBuilder::new()
-            .with_product_id(PRODUCT_ID.to_string())
+    fn make_mfg_batch() -> mfg_batch {
+        mfg_batchBuilder::new()
+            .with_mfg_batch_id(mfg_batch_ID.to_string())
             .with_owner("some_owner".to_string())
-            .with_product_namespace(ProductNamespace::Gs1)
+            .with_mfg_batch_namespace(MfgBatchNamespace::Gs1)
             .with_properties(make_properties())
             .build()
-            .expect("Failed to build new_product")
+            .expect("Failed to build new_mfg_batch")
     }
 
     fn make_properties() -> Vec<PropertyValue> {
         let property_value_description = PropertyValueBuilder::new()
             .with_name("description".into())
             .with_data_type(DataType::String)
-            .with_string_value("This is a product description".into())
+            .with_string_value("This is a mfg_batch description".into())
             .build()
             .unwrap();
         let property_value_price = PropertyValueBuilder::new()

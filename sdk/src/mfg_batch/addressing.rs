@@ -12,12 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub const GRID_NAMESPACE: &str = "621dee";
-pub const PRODUCT_PREFIX: &str = "02";
-pub const GRID_PRODUCT_NAMESPACE: &str = "621dee02";
+
+/*
+# Adding namespace based on contract seed logic
+#   hashlib.sha512('grid_mfg_batch'.encode("utf-8")).hexdigest()[0:6]
+# '11bb0e'
+*/
+pub const GRID_NAMESPACE: &str = "11bb0e";
+pub const PRODUCT_PREFIX: &str = "01";
+pub const GRID_PRODUCT_NAMESPACE: &str = "11bb0e01";
 
 /// Computes the address of a GS1 product based on its GTIN
-pub fn compute_gs1_product_address(gtin: &str) -> String {
+pub fn compute_gs1_mfg_batch_address(gtin: &str) -> String {
     // 621ddee (grid namespace) + 02 (product namespace) + 01 (gs1 namespace)
     String::from(GRID_NAMESPACE)
         + PRODUCT_PREFIX
@@ -26,3 +32,4 @@ pub fn compute_gs1_product_address(gtin: &str) -> String {
         + &format!("{:0>14}", gtin)
         + "00"
 }
+ 

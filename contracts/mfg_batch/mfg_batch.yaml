@@ -13,19 +13,13 @@
 # limitations under the License.
 
 name: grid_mfg_batch
-version: '2'
-wasm: /tmp/grid-mfg-batch-tp.wasm
+version: '1'
 inputs:
-
-#TODO Update this 
-
-
-  # - '621dee01'
-  # - '621dee02'
-  # - '621dee05'
+  - '621dee01'
+  - '11bb0e01'
+  - '621dee05'
 outputs:
-  # - '621dee02'
-  #11bb0e
+  - '11bb0e01'
 
 #   hashlib.sha512('grid_mfg_batch'.encode("utf-8")).hexdigest()[0:6]
 # '11bb0e'
