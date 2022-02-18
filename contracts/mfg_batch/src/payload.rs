@@ -21,12 +21,12 @@ cfg_if! {
     }
 }
 
-use grid_sdk::protocol::product::payload::{Action, MfgBatchCreateAction, MfgBatchPayload};
+use grid_sdk::protocol::mfg_batch::payload::{Action, MfgBatchCreateAction, MfgBatchPayload};
 
 pub fn validate_payload(payload: &MfgBatchPayload) -> Result<(), ApplyError> {
     validate_timestamp(*payload.timestamp())?;
     match payload.action() {
-        Action::ProductCreate(action_payload) => validate_mfg_batch_create_action(action_payload),
+        Action::MfgBatchCreate(action_payload) => validate_mfg_batch_create_action(action_payload),
         _ => Ok(()),
     }
 }

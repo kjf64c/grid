@@ -1,3 +1,4 @@
+// MFG_BATCH::handlers.rs
 // Copyright (c) 2019 Target Brands, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,7 +30,7 @@ cfg_if! {
 
 use grid_sdk::{
     pike::permissions::PermissionChecker,
-    product::addressing::GRID_NAMESPACE,
+    mfg_batch::addressing::GRID_NAMESPACE,
     protocol::mfg_batch::{
         payload::{
             Action, MfgBatchCreateAction, MfgBatchDeleteAction, MfgBatchPayload, MfgBatchUpdateAction,
@@ -98,12 +99,12 @@ impl MfgBatchTransactionHandler {
         check_permission(
             perm_checker,
             signer,
-            &permission_to_perm_string(Permission::CanCreateProduct),
+            &permission_to_perm_string(Permission::CanCreateMfgBatch),
             owner,
         )?;
 
         // Check if product exists in state
-        if state.get_product(mfg_batch_id)?.is_some() {
+        if state.get_mfg_batch(mfg_batch_id)?.is_some() {
             return Err(ApplyError::InvalidTransaction(format!(
                 "Product already exists: {}",
                 mfg_batch_id,
@@ -111,7 +112,7 @@ impl MfgBatchTransactionHandler {
         }
 
         // Check if the product namespace is a GS1 product
-        if product_namespace != &MfgBatchNamespace::Gs1 {
+        if mfg_batch_namespace != &MfgBatchNamespace::Gs1 {
             return Err(ApplyError::InvalidTransaction(
                 "Invalid product namespace enum for product".to_string(),
             ));
@@ -135,7 +136,7 @@ impl MfgBatchTransactionHandler {
 
         /* Check if the agents organization contain GS1 Company Prefix key in its alternate IDs
         (gs1_company_prefix), and the prefix must match the company prefix in the mfg_batch_id */
-        if payload.product_namespace() == &MfgBatchNamespace::Gs1 {
+        if payload.mfg_batch_namespace() == &MfgBatchNamespace::Gs1 {
             let metadata = org.alternate_ids().to_vec();
             let gs1_company_prefix = match metadata
                 .iter()
@@ -158,7 +159,7 @@ impl MfgBatchTransactionHandler {
             }
         }
 
-        if payload.product_namespace() == &MfgBatchNamespace::Gs1 {
+        if payload.mfg_batch_namespace() == &MfgBatchNamespace::Gs1 {
             // Check if gs1 schema exists
             let schema = if let Some(schema) = state.get_schema("gs1_product")? {
                 schema
@@ -201,14 +202,14 @@ impl MfgBatchTransactionHandler {
         let new_product = MfgBatchBuilder::new()
             .with_mfg_batch_id(mfg_batch_id.to_string())
             .with_owner(owner.to_string())
-            .with_product_namespace(product_namespace.clone())
+            .with_mfg_batch_namespace(mfg_batch_namespace.clone())
             .with_properties(properties.to_vec())
             .build()
             .map_err(|err| {
                 ApplyError::InvalidTransaction(format!("Cannot build product: {}", err))
             })?;
 
-        state.set_product(mfg_batch_id, new_product)?;
+        state.set_mfg_batch(mfg_batch_id, new_product)?;
 
         Ok(())
     }
@@ -221,11 +222,11 @@ impl MfgBatchTransactionHandler {
         perm_checker: &PermissionChecker,
     ) -> Result<(), ApplyError> {
         let mfg_batch_id = payload.mfg_batch_id();
-        let product_namespace = payload.product_namespace();
+        let mfg_batch_namespace = payload.mfg_batch_namespace();
         let properties = payload.properties();
 
         // Check if the product namespace is a GS1 product
-        if product_namespace != &MfgBatchNamespace::Gs1 {
+        if mfg_batch_namespace != &MfgBatchNamespace::Gs1 {
             return Err(ApplyError::InvalidTransaction(
                 "Invalid product namespace enum for product".to_string(),
             ));
@@ -245,7 +246,7 @@ impl MfgBatchTransactionHandler {
         check_permission(
             perm_checker,
             signer,
-            &permission_to_perm_string(Permission::CanUpdateProduct),
+            &permission_to_perm_string(Permission::CanUpdateMfgBatch),
             product.owner(),
         )?;
 
@@ -328,7 +329,7 @@ impl MfgBatchTransactionHandler {
         }
 
         // Check if product exists in state
-        let product = match state.get_product(mfg_batch_id) {
+        let product = match state.get_mfg_batch(mfg_batch_id) {
             Ok(Some(product)) => Ok(product),
             Ok(None) => Err(ApplyError::InvalidTransaction(format!(
                 "No product exists: {}",
@@ -341,7 +342,7 @@ impl MfgBatchTransactionHandler {
         check_permission(
             perm_checker,
             signer,
-            &permission_to_perm_string(Permission::CanDeleteProduct),
+            &permission_to_perm_string(Permission::CanDeleteMfgBatch),
             product.owner(),
         )?;
 
@@ -351,7 +352,7 @@ impl MfgBatchTransactionHandler {
         }
 
         // Delete the product
-        state.remove_product(mfg_batch_id)?;
+        state.remove_mfg_batch(mfg_batch_id)?;
         Ok(())
     }
 }
