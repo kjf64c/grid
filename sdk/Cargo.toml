@@ -116,6 +116,7 @@ experimental = [
     "stable",
     # The following features are experimental:
     "batch-processor",
+    "mfg_batch",
     "batch-store",
     "rest-api-actix-web-3",
     "rest-api-actix-web-3-run",

@@ -19,14 +19,14 @@
 # '11bb0e'
 */
 pub const GRID_NAMESPACE: &str = "11bb0e";
-pub const PRODUCT_PREFIX: &str = "01";
-pub const GRID_PRODUCT_NAMESPACE: &str = "11bb0e01";
+pub const MFG_BATCH_PREFIX: &str = "01";
+pub const GRID_MFG_BATCH_NAMESPACE: &str = "11bb0e01";
 
-/// Computes the address of a GS1 product based on its GTIN
+/// Computes the address of a GS1 product based on its 
 pub fn compute_gs1_mfg_batch_address(gtin: &str) -> String {
     // 621ddee (grid namespace) + 02 (product namespace) + 01 (gs1 namespace)
     String::from(GRID_NAMESPACE)
-        + PRODUCT_PREFIX
+        + MFG_BATCH_PREFIX
         + "01"
         + "00000000000000000000000000000000000000000000"
         + &format!("{:0>14}", gtin)

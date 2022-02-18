@@ -375,13 +375,13 @@ impl TransactionHandler for MfgBatchTransactionHandler {
         context: &mut dyn TransactionContext,
     ) -> Result<(), ApplyError> {
         let payload = MfgBatchPayload::from_bytes(request.get_payload()).map_err(|err| {
-            ApplyError::InvalidTransaction(format!("Cannot build product payload: {}", err))
+            ApplyError::InvalidTransaction(format!("Cannot build manufacturig batch payload: {}", err))
         })?;
 
         validate_payload(&payload)?;
 
         info!(
-            "Grid Product Payload {:?} {}",
+            "Grid Manufactured Batch Payload {:?} {}",
             payload.action(),
             payload.timestamp(),
         );

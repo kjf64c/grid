@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM hyperledger/grid-dev:v9 as grid-product-builder
+FROM hyperledger/grid-dev:v9 as grid-mfg-batch-builder
 
 # Copy over Cargo.toml files
 COPY Cargo.toml /build/Cargo.toml
@@ -25,42 +25,43 @@ COPY sdk/Cargo.toml /build/sdk/Cargo.toml
 COPY contracts/location/Cargo.toml /build/contracts/location/Cargo.toml
 COPY contracts/pike/Cargo.toml /build/contracts/pike/Cargo.toml
 COPY contracts/product/Cargo.toml /build/contracts/product/Cargo.toml
+COPY contracts/mfg_batch/Cargo.toml /build/contracts/mfg_batch/Cargo.toml
 COPY contracts/purchase_order/Cargo.toml /build/contracts/purchase_order/Cargo.toml
 COPY contracts/schema/Cargo.toml /build/contracts/schema/Cargo.toml
 COPY contracts/track_and_trace/Cargo.toml /build/contracts/track_and_trace/Cargo.toml
 
 # Copy over build files
-COPY contracts/product /build/contracts/product
+COPY contracts/mfg_batch /build/contracts/mfg_batch
 COPY sdk/ /build/sdk/
 
 # Build the contract
 ARG REPO_VERSION
-RUN sed -i -e "0,/version.*$/ s/version.*$/version\ =\ \"${REPO_VERSION}\"/" contracts/product/Cargo.toml
-RUN cargo build --manifest-path contracts/product/Cargo.toml --target wasm32-unknown-unknown --release
+RUN sed -i -e "0,/version.*$/ s/version.*$/version\ =\ \"${REPO_VERSION}\"/" contracts/mfg_batch/Cargo.toml
+RUN cargo build --manifest-path contracts/mfg_batch/Cargo.toml --target wasm32-unknown-unknown --release
 
 # Build a scar file
 # Copy the packaging directory
-COPY contracts/product/packaging/scar/* \
-     /build/contracts/product/packaging/scar/
+COPY contracts/mfg_batch/packaging/scar/* \
+     /build/contracts/mfg_batch/packaging/scar/
 
 # Copy the contract to the packaging directory
-RUN cp /build/target/wasm32-unknown-unknown/release/grid-product-tp.wasm \
-    /build/contracts/product/packaging/scar
+RUN cp /build/target/wasm32-unknown-unknown/release/grid-mfg_batch-tp.wasm \
+    /build/contracts/mfg_batch/packaging/scar
 
-WORKDIR /build/contracts/product/packaging/scar
+WORKDIR /build/contracts/mfg_batch/packaging/scar
 
 # Create .scar file
-RUN tar -jcvf /tmp/grid-product_${REPO_VERSION}.scar .
+RUN tar -jcvf /tmp/grid-mfg_batch_${REPO_VERSION}.scar .
 
-# -------------=== product submitter build ===-------------
+# -------------=== mfg_batch submitter build ===-------------
 
 FROM hyperledger/sawtooth-sabre-cli:0.5
 
-COPY --from=grid-product-builder \
-     /build/target/wasm32-unknown-unknown/release/grid-product-tp.wasm /tmp
+COPY --from=grid-mfg_batch-builder \
+     /build/target/wasm32-unknown-unknown/release/grid-mfg_batch-tp.wasm /tmp
 
 # Copy the contract definition
-COPY contracts/product/product.yaml /tmp
+COPY contracts/mfg_batch/mfg_batch.yaml /tmp
 
-COPY --from=grid-product-builder \
-    /tmp/grid-product*.scar /tmp
+COPY --from=grid-mfg_batch-builder \
+    /tmp/grid-mfg_batch*.scar /tmp
