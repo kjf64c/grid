@@ -13,16 +13,16 @@
 // limitations under the License.
 
 pub enum Permission {
-    CanCreateProduct,
-    CanUpdateProduct,
-    CanDeleteProduct,
+    CanCreateMfgBatch,
+    CanUpdateMfgBatch,
+    CanDeleteMfgBatch,
 }
 
 pub fn permission_to_perm_string(permission: Permission) -> String {
     match permission {
-        Permission::CanCreateProduct => String::from("product::can-create-product"),
-        Permission::CanUpdateProduct => String::from("product::can-update-product"),
-        Permission::CanDeleteProduct => String::from("product::can-delete-product"),
+        Permission::CanCreateMfgBatch => String::from("mfg_batch::can-create-mfg-batch"),
+        Permission::CanUpdateMfgBatch => String::from("mfg_batch::can-update-mfg-batch"),
+        Permission::CanDeleteMfgBatch => String::from("mfg_batch::can-delete-mfg-batch"),
     }
 }
 

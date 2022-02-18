@@ -20,6 +20,9 @@ cfg_if! {
     }
 }
 
+// Validates the specification for GS1 standard format 
+// No immediate changes required for MVP
+
 /* The purpose of this file is to programmatically express the equation used to validate a GTIN
 It validates gtin format to avoid mistype errors similar to a credit card validation
 Check digit validation: (https://www.gs1.org/services/how-calculate-check-digit-manually) */

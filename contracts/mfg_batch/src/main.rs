@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
+// Fun fact https://crates.io/crates/diesel (Rust ORM)
 #[macro_use]
 extern crate cfg_if;
 extern crate grid_sdk;

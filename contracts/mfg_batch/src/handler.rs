@@ -424,6 +424,8 @@ fn check_permission(
     }
 }
 
+/*
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1086,3 +1088,5 @@ mod tests {
             .expect("Failed to build MfgBatchDeleteAction")
     }
 }
+
+*/

@@ -16,6 +16,11 @@ pub mod addressing;
 pub mod store;
 
 pub const MAX_COMMIT_NUM: i64 = i64::MAX;
-
+//TODO decide what to do with internal validations 
+/*
+- Store non-gs1 internal blocks
+-- Link to supporting information
+-- Consider if information could extend selectively
+*/
 #[cfg(feature = "product-gdsn")]
 pub mod gdsn;

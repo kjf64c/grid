@@ -230,6 +230,8 @@ impl<'a> MfgBatchState<'a> {
     }
 }
 
+/*
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -345,3 +347,4 @@ mod tests {
         ]
     }
 }
+*/
