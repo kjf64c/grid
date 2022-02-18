@@ -15,7 +15,7 @@
 [package]
 name = "grid-mfg-batch-tp"
 version = "0.4.1"
-authors = ["Target Inc"]
+authors = ["A Company"]
 description = "Grid Manufactured Batch Smart Contract"
 homepage = "https://grid.hyperledger.org"
 edition = "2018"

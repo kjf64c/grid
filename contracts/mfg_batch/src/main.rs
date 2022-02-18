@@ -1,3 +1,5 @@
+//MFG_BATCH
+
 // Copyright 2019 Cargill Incorporated
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -57,6 +59,7 @@ fn main() {
 
     let endpoint = matches
         .value_of("connect")
+        // Attach WASM to Sabre validator 
         .unwrap_or("tcp://localhost:4004");
 
     let console_log_level;
@@ -67,10 +70,10 @@ fn main() {
         _ => console_log_level = LogLevelFilter::Trace,
     }
 
+    // Format and log messages
     let stdout = ConsoleAppender::builder()
         // Create a heap reference object
         .encoder(Box::new(PatternEncoder::new(
-            // What does this do?
             "{h({l:5.5})} | {({M}:{L}):20.20} | {m}{n}",
         )))
         .build();
