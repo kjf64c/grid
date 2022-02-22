@@ -28,7 +28,7 @@ use grid_sdk::{
     mfg_batch::addressing::compute_gs1_mfg_batch_address,
     protocol::{
         pike::state::{Organization, OrganizationList},
-        mfg_batch::state::{MfgBatch, MfgBatchList, MfgBatchBuilder},
+        mfg_batch::state::{MfgBatch, MfgBatchList, MfgBatchListBuilder},
         schema::state::{Schema, SchemaList},
     },
     protos::{FromBytes, IntoBytes},
@@ -50,7 +50,7 @@ impl<'a> MfgBatchState<'a> {
         let d = self.context.get_state_entry(&address)?;
         match d {
             Some(packed) => {
-                let mfg_batches = match MfgBatch::from_bytes(packed.as_slice()) {
+                let mfg_batches = match MfgBatchList::from_bytes(packed.as_slice()) {
                     Ok(mfg_batches) => mfg_batches,
                     Err(_) => {
                         return Err(ApplyError::InternalError(String::from(
@@ -75,7 +75,7 @@ impl<'a> MfgBatchState<'a> {
         let address = compute_gs1_mfg_batch_address(mfg_batch_id);
         let d = self.context.get_state_entry(&address)?;
         let mut mfg_batches = match d {
-            Some(packed) => match MfgBatch::from_bytes(packed.as_slice()) {
+            Some(packed) => match MfgBatchList::from_bytes(packed.as_slice()) {
                 Ok(mfg_batch_list) => mfg_batch_list.mfg_batches().to_vec(),
                 Err(err) => {
                     return Err(ApplyError::InternalError(format!(
@@ -100,7 +100,7 @@ impl<'a> MfgBatchState<'a> {
         }
         mfg_batches.push(mfg_batch);
         mfg_batches.sort_by_key(|r| r.mfg_batch_id().to_string());
-        let mfg_batch_list = MfgBatchBuilder::new()
+        let mfg_batch_list = MfgBatchListBuilder::new()
             .with_mfg_batches(mfg_batches)
             .build()
             .map_err(|err| {
@@ -128,7 +128,7 @@ impl<'a> MfgBatchState<'a> {
         let address = compute_gs1_mfg_batch_address(mfg_batch_id);
         let d = self.context.get_state_entry(&address)?;
         let mfg_batches = match d {
-            Some(packed) => match MfgBatch::from_bytes(packed.as_slice()) {
+            Some(packed) => match MfgBatchList::from_bytes(packed.as_slice()) {
                 Ok(mfg_batch_list) => mfg_batch_list.mfg_batches().to_vec(),
                 Err(err) => {
                     return Err(ApplyError::InternalError(format!(
@@ -153,7 +153,7 @@ impl<'a> MfgBatchState<'a> {
                 .delete_state_entries(&[address])
                 .map_err(|err| ApplyError::InternalError(format!("{}", err)))?;
         } else {
-            let mfg_batch_list = MfgBatchBuilder::new()
+            let mfg_batch_list = MfgBatchListBuilder::new()
                 .with_mfg_batches(filtered_mfg_batches)
                 .build()
                 .map_err(|err| {

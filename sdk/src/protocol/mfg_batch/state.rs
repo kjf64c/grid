@@ -105,12 +105,12 @@ impl MfgBatch {
 }
 
 impl FromProto<protos::mfg_batch_state::MfgBatch> for MfgBatch {
-    fn from_proto(product: protos::mfg_batch_state::MfgBatch) -> Result<Self, ProtoConversionError> {
+    fn from_proto(mfg_batch: protos::mfg_batch_state::MfgBatch) -> Result<Self, ProtoConversionError> {
         Ok(MfgBatch {
-            mfg_batch_id: product.get_mfg_batch_id().to_string(),
-            mfg_batch_namespace: MfgBatchNamespace::from_proto(product.get_mfg_batch_namespace())?,
-            owner: product.get_owner().to_string(),
-            properties: product
+            mfg_batch_id: mfg_batch.get_mfg_batch_id().to_string(),
+            mfg_batch_namespace: MfgBatchNamespace::from_proto(mfg_batch.get_mfg_batch_namespace())?,
+            owner: mfg_batch.get_owner().to_string(),
+            properties: mfg_batch
                 .get_properties()
                 .to_vec()
                 .into_iter()
@@ -121,13 +121,13 @@ impl FromProto<protos::mfg_batch_state::MfgBatch> for MfgBatch {
 }
 
 impl FromNative<MfgBatch> for protos::mfg_batch_state::MfgBatch {
-    fn from_native(product: MfgBatch) -> Result<Self, ProtoConversionError> {
+    fn from_native(mfg_batch: MfgBatch) -> Result<Self, ProtoConversionError> {
         let mut proto = protos::mfg_batch_state::MfgBatch::new();
-        proto.set_mfg_batch_id(product.mfg_batch_id().to_string());
-        proto.set_mfg_batch_namespace(product.mfg_batch_namespace().clone().into_proto()?);
-        proto.set_owner(product.owner().to_string());
+        proto.set_mfg_batch_id(mfg_batch.mfg_batch_id().to_string());
+        proto.set_mfg_batch_namespace(mfg_batch.mfg_batch_namespace().clone().into_proto()?);
+        proto.set_owner(mfg_batch.owner().to_string());
         proto.set_properties(RepeatedField::from_vec(
-            product
+            mfg_batch
                 .properties()
                 .to_vec()
                 .into_iter()
@@ -275,10 +275,10 @@ impl MfgBatchList {
 
 impl FromProto<protos::mfg_batch_state::MfgBatchList> for MfgBatchList {
     fn from_proto(
-        product_list: protos::mfg_batch_state::MfgBatchList,
+        mfg_batch_list: protos::mfg_batch_state::MfgBatchList,
     ) -> Result<Self, ProtoConversionError> {
         Ok(MfgBatchList {
-            mfg_batches: product_list
+            mfg_batches: mfg_batch_list
                 .get_entries()
                 .to_vec()
                 .into_iter()
@@ -289,11 +289,11 @@ impl FromProto<protos::mfg_batch_state::MfgBatchList> for MfgBatchList {
 }
 
 impl FromNative<MfgBatchList> for protos::mfg_batch_state::MfgBatchList {
-    fn from_native(product_list: MfgBatchList) -> Result<Self, ProtoConversionError> {
-        let mut product_list_proto = protos::mfg_batch_state::MfgBatchList::new();
+    fn from_native(mfg_batch_list: MfgBatchList) -> Result<Self, ProtoConversionError> {
+        let mut mfg_batch_list_proto = protos::mfg_batch_state::MfgBatchList::new();
 
-        product_list_proto.set_entries(RepeatedField::from_vec(
-            product_list
+        mfg_batch_list_proto.set_entries(RepeatedField::from_vec(
+            mfg_batch_list
                 .mfg_batches()
                 .to_vec()
                 .into_iter()
@@ -301,7 +301,7 @@ impl FromNative<MfgBatchList> for protos::mfg_batch_state::MfgBatchList {
                 .collect::<Result<Vec<protos::mfg_batch_state::MfgBatch>, ProtoConversionError>>()?,
         ));
 
-        Ok(product_list_proto)
+        Ok(mfg_batch_list_proto)
     }
 }
 
@@ -396,7 +396,7 @@ impl MfgBatchListBuilder {
         Ok(MfgBatchList { mfg_batches })
     }
 }
-/*
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -405,29 +405,29 @@ mod tests {
 
     #[test]
     /// Validate that a `MfgBatch` may be built correctly
-    fn test_product_builder() {
-        let product = build_product();
+    fn test_mfg_batch_builder() {
+        let mfg_batch = build_mfg_batch();
 
-        assert_eq!(product.mfg_batch_id(), "688955434684");
-        assert_eq!(*product.mfg_batch_namespace(), MfgBatchNamespace::Gs1);
-        assert_eq!(product.owner(), "Target");
-        assert_eq!(product.properties()[0].name(), "description");
-        assert_eq!(*product.properties()[0].data_type(), DataType::String);
+        assert_eq!(mfg_batch.mfg_batch_id(), "688955434684");
+        assert_eq!(*mfg_batch.mfg_batch_namespace(), MfgBatchNamespace::Gs1);
+        assert_eq!(mfg_batch.owner(), "Target");
+        assert_eq!(mfg_batch.properties()[0].name(), "description");
+        assert_eq!(*mfg_batch.properties()[0].data_type(), DataType::String);
         assert_eq!(
-            product.properties()[0].string_value(),
-            "This is a product description"
+            mfg_batch.properties()[0].string_value(),
+            "This is a mfg_batch description"
         );
-        assert_eq!(product.properties()[1].name(), "price");
-        assert_eq!(*product.properties()[1].data_type(), DataType::Number);
-        assert_eq!(*product.properties()[1].number_value(), 3);
+        assert_eq!(mfg_batch.properties()[1].name(), "price");
+        assert_eq!(*mfg_batch.properties()[1].data_type(), DataType::Number);
+        assert_eq!(*mfg_batch.properties()[1].number_value(), 3);
     }
 
     #[test]
     /// Validate that a `MfgBatch` may be correctly converted back to its respective builder
-    fn test_product_into_builder() {
-        let product = build_product();
+    fn test_mfg_batch_into_builder() {
+        let mfg_batch = build_mfg_batch();
 
-        let builder = product.into_builder();
+        let builder = mfg_batch.into_builder();
 
         assert_eq!(builder.mfg_batch_id, Some("688955434684".to_string()));
         assert_eq!(builder.mfg_batch_namespace, Some(MfgBatchNamespace::Gs1));
@@ -438,7 +438,7 @@ mod tests {
     #[test]
     /// Validate that a `MfgBatch` may be correctly converted into bytes and then back to its native
     /// representation
-    fn test_product_into_bytes() {
+    fn test_mfg_batch_into_bytes() {
         let builder = MfgBatchBuilder::new();
         let original = builder
             .with_mfg_batch_id("688955434684".into())
@@ -453,70 +453,70 @@ mod tests {
 
     #[test]
     /// Validate that a list of mfg_batches, `MfgBatchList`, can be built correctly
-    fn test_product_list_builder() {
-        let product_list = build_product_list();
+    fn test_mfg_batch_list_builder() {
+        let mfg_batch_list = build_mfg_batch_list();
 
-        assert_eq!(product_list.mfg_batches.len(), 2);
+        assert_eq!(mfg_batch_list.mfg_batches.len(), 2);
 
-        // Test product 1
-        assert_eq!(product_list.mfg_batches[0].mfg_batch_id(), "688955434684");
+        // Test mfg_batch 1
+        assert_eq!(mfg_batch_list.mfg_batches[0].mfg_batch_id(), "688955434684");
         assert_eq!(
-            *product_list.mfg_batches[0].mfg_batch_namespace(),
+            *mfg_batch_list.mfg_batches[0].mfg_batch_namespace(),
             MfgBatchNamespace::Gs1
         );
-        assert_eq!(product_list.mfg_batches[0].owner(), "Target");
+        assert_eq!(mfg_batch_list.mfg_batches[0].owner(), "Target");
         assert_eq!(
-            product_list.mfg_batches[0].properties()[0].name(),
+            mfg_batch_list.mfg_batches[0].properties()[0].name(),
             "description"
         );
         assert_eq!(
-            *product_list.mfg_batches[0].properties()[0].data_type(),
+            *mfg_batch_list.mfg_batches[0].properties()[0].data_type(),
             DataType::String
         );
         assert_eq!(
-            product_list.mfg_batches[0].properties()[0].string_value(),
-            "This is a product description"
+            mfg_batch_list.mfg_batches[0].properties()[0].string_value(),
+            "This is a mfg_batch description"
         );
-        assert_eq!(product_list.mfg_batches[0].properties()[1].name(), "price");
+        assert_eq!(mfg_batch_list.mfg_batches[0].properties()[1].name(), "price");
         assert_eq!(
-            *product_list.mfg_batches[0].properties()[1].data_type(),
+            *mfg_batch_list.mfg_batches[0].properties()[1].data_type(),
             DataType::Number
         );
-        assert_eq!(*product_list.mfg_batches[0].properties()[1].number_value(), 3);
+        assert_eq!(*mfg_batch_list.mfg_batches[0].properties()[1].number_value(), 3);
 
-        // Test product 2
-        assert_eq!(product_list.mfg_batches[1].mfg_batch_id(), "688955434685");
+        // Test mfg_batch 2
+        assert_eq!(mfg_batch_list.mfg_batches[1].mfg_batch_id(), "688955434685");
         assert_eq!(
-            *product_list.mfg_batches[1].mfg_batch_namespace(),
+            *mfg_batch_list.mfg_batches[1].mfg_batch_namespace(),
             MfgBatchNamespace::Gs1
         );
-        assert_eq!(product_list.mfg_batches[1].owner(), "Cargill");
+        assert_eq!(mfg_batch_list.mfg_batches[1].owner(), "Cargill");
         assert_eq!(
-            product_list.mfg_batches[1].properties()[0].name(),
+            mfg_batch_list.mfg_batches[1].properties()[0].name(),
             "description"
         );
         assert_eq!(
-            *product_list.mfg_batches[1].properties()[0].data_type(),
+            *mfg_batch_list.mfg_batches[1].properties()[0].data_type(),
             DataType::String
         );
         assert_eq!(
-            product_list.mfg_batches[1].properties()[0].string_value(),
-            "This is a product description"
+            mfg_batch_list.mfg_batches[1].properties()[0].string_value(),
+            "This is a mfg_batch description"
         );
-        assert_eq!(product_list.mfg_batches[1].properties()[1].name(), "price");
+        assert_eq!(mfg_batch_list.mfg_batches[1].properties()[1].name(), "price");
         assert_eq!(
-            *product_list.mfg_batches[1].properties()[1].data_type(),
+            *mfg_batch_list.mfg_batches[1].properties()[1].data_type(),
             DataType::Number
         );
-        assert_eq!(*product_list.mfg_batches[1].properties()[1].number_value(), 3);
+        assert_eq!(*mfg_batch_list.mfg_batches[1].properties()[1].number_value(), 3);
     }
 
     #[test]
     /// Validate that a `MfgBatchList` can be correctly converted back to a builder
-    fn test_product_list_into_builder() {
-        let product_list = build_product_list();
+    fn test_mfg_batch_list_into_builder() {
+        let mfg_batch_list = build_mfg_batch_list();
 
-        let builder = product_list.into_builder();
+        let builder = mfg_batch_list.into_builder();
 
         assert_eq!(builder.mfg_batches, Some(make_mfg_batches()));
     }
@@ -524,28 +524,28 @@ mod tests {
     #[test]
     /// Validate that a `MfgBatchList` can be converted into bytes and back to its native
     /// representation successfully
-    fn test_product_list_into_bytes() {
+    fn test_mfg_batch_list_into_bytes() {
         let builder = MfgBatchListBuilder::new();
         let original = builder.with_mfg_batches(make_mfg_batches()).build().unwrap();
 
         test_from_bytes(original, MfgBatchList::from_bytes);
     }
 
-    fn build_product() -> MfgBatch {
+    fn build_mfg_batch() -> MfgBatch {
         MfgBatchBuilder::new()
             .with_mfg_batch_id("688955434684".into()) // GTIN-12
             .with_mfg_batch_namespace(MfgBatchNamespace::Gs1)
             .with_owner("Target".into())
             .with_properties(make_properties())
             .build()
-            .expect("Failed to build test product")
+            .expect("Failed to build test mfg_batch")
     }
 
     fn make_properties() -> Vec<PropertyValue> {
         let property_value_description = PropertyValueBuilder::new()
             .with_name("description".into())
             .with_data_type(DataType::String)
-            .with_string_value("This is a product description".into())
+            .with_string_value("This is a mfg_batch description".into())
             .build()
             .unwrap();
         let property_value_price = PropertyValueBuilder::new()
@@ -561,11 +561,11 @@ mod tests {
         ]
     }
 
-    fn build_product_list() -> MfgBatchList {
+    fn build_mfg_batch_list() -> MfgBatchList {
         MfgBatchListBuilder::new()
             .with_mfg_batches(make_mfg_batches())
             .build()
-            .expect("Failed to build test product list")
+            .expect("Failed to build test mfg_batch list")
     }
 
     fn make_mfg_batches() -> Vec<MfgBatch> {
@@ -576,14 +576,14 @@ mod tests {
                 .with_owner("Target".into())
                 .with_properties(make_properties())
                 .build()
-                .expect("Failed to build test product"),
+                .expect("Failed to build test mfg_batch"),
             MfgBatchBuilder::new()
                 .with_mfg_batch_id("688955434685".into()) // GTIN-12
                 .with_mfg_batch_namespace(MfgBatchNamespace::Gs1)
                 .with_owner("Cargill".into())
                 .with_properties(make_properties())
                 .build()
-                .expect("Failed to build test product"),
+                .expect("Failed to build test mfg_batch"),
         ]
     }
 
@@ -598,5 +598,5 @@ mod tests {
         assert_eq!(under_test, created_from_bytes);
     }
 }
-*/
+
 
