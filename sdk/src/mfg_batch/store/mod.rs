@@ -529,14 +529,14 @@ pub trait MfgBatchStore {
         service_id: Option<&str>,
     ) -> Result<Option<MfgBatch>, MfgBatchStoreError>;
 
-    /// Gets a list of mfg_batchs from the underlying storage
+    /// Gets a list of mfg_batches from the underlying storage
     ///
     /// # Arguments
     ///
     ///  * `service_id` - The service ID to fetch the mfg_batch for
     ///  * `offset` - The index of the first in storage to retrieve
     ///  * `limit` - The number of items to retrieve from the offset
-    fn list_mfg_batchs(
+    fn list_mfg_batches(
         &self,
         service_id: Option<&str>,
         offset: i64,
@@ -586,13 +586,13 @@ where
         (**self).get_mfg_batch(mfg_batch_id, service_id)
     }
 
-    fn list_mfg_batchs(
+    fn list_mfg_batches(
         &self,
         service_id: Option<&str>,
         offset: i64,
         limit: i64,
     ) -> Result<MfgBatchList, MfgBatchStoreError> {
-        (**self).list_mfg_batchs(service_id, offset, limit)
+        (**self).list_mfg_batches(service_id, offset, limit)
     }
 
     fn update_mfg_batch(

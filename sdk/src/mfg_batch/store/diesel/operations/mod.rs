@@ -15,7 +15,7 @@
 pub(super) mod add_mfg_batch;
 pub(super) mod delete_mfg_batch;
 pub(super) mod get_mfg_batch;
-pub(super) mod list_mfg_batch;
+pub(super) mod list_mfg_batches;
 pub(super) mod update_mfg_batch;
 
 pub(super) struct MfgBatchStoreOperations<'a, C> {

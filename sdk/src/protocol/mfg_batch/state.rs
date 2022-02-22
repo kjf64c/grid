@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//! Protocol structs for Product state
+//! Protocol structs for MfgBatch state
 
 use protobuf::Message;
 use protobuf::RepeatedField;
@@ -27,63 +27,63 @@ use crate::protos::{
 
 use crate::protocol::schema::state::PropertyValue;
 
-/// Possible Product namespaces
+/// Possible MfgBatch namespaces
 ///
-/// The namespace determines the schema used to define a `Product`'s properties
+/// The namespace determines the schema used to define a `MfgBatch`'s properties
 #[derive(Debug, Clone, PartialEq)]
-pub enum ProductNamespace {
+pub enum MfgBatchNamespace {
     Gs1,
 }
 
-impl Default for ProductNamespace {
+impl Default for MfgBatchNamespace {
     fn default() -> Self {
-        ProductNamespace::Gs1
+        MfgBatchNamespace::Gs1
     }
 }
 
-impl FromProto<protos::product_state::Product_ProductNamespace> for ProductNamespace {
+impl FromProto<protos::mfg_batch_state::MfgBatch_MfgBatchNamespace> for MfgBatchNamespace {
     fn from_proto(
-        product_namespace: protos::product_state::Product_ProductNamespace,
+        product_namespace: protos::mfg_batch_state::MfgBatch_MfgBatchNamespace,
     ) -> Result<Self, ProtoConversionError> {
         match product_namespace {
-            protos::product_state::Product_ProductNamespace::GS1 => Ok(ProductNamespace::Gs1),
-            protos::product_state::Product_ProductNamespace::UNSET_TYPE => {
+            protos::mfg_batch_state::MfgBatch_MfgBatchNamespace::GS1 => Ok(MfgBatchNamespace::Gs1),
+            protos::mfg_batch_state::MfgBatch_MfgBatchNamespace::UNSET_TYPE => {
                 Err(ProtoConversionError::InvalidTypeError(
-                    "Cannot convert Product_ProductNamespace with type UNSET_TYPE".to_string(),
+                    "Cannot convert MfgBatch_MfgBatchNamespace with type UNSET_TYPE".to_string(),
                 ))
             }
         }
     }
 }
 
-impl FromNative<ProductNamespace> for protos::product_state::Product_ProductNamespace {
-    fn from_native(product_namespace: ProductNamespace) -> Result<Self, ProtoConversionError> {
+impl FromNative<MfgBatchNamespace> for protos::mfg_batch_state::MfgBatch_MfgBatchNamespace {
+    fn from_native(product_namespace: MfgBatchNamespace) -> Result<Self, ProtoConversionError> {
         match product_namespace {
-            ProductNamespace::Gs1 => Ok(protos::product_state::Product_ProductNamespace::GS1),
+            MfgBatchNamespace::Gs1 => Ok(protos::mfg_batch_state::MfgBatch_MfgBatchNamespace::GS1),
         }
     }
 }
 
-impl IntoProto<protos::product_state::Product_ProductNamespace> for ProductNamespace {}
-impl IntoNative<ProductNamespace> for protos::product_state::Product_ProductNamespace {}
+impl IntoProto<protos::mfg_batch_state::MfgBatch_MfgBatchNamespace> for MfgBatchNamespace {}
+impl IntoNative<MfgBatchNamespace> for protos::mfg_batch_state::MfgBatch_MfgBatchNamespace {}
 
-/// Native representation of `Product`
+/// Native representation of `MfgBatch`
 ///
-/// A `Product` contains a list of properties determined by the `product_namespace`.
+/// A `MfgBatch` contains a list of properties determined by the `product_namespace`.
 #[derive(Debug, Clone, PartialEq)]
-pub struct Product {
+pub struct MfgBatch {
     product_id: String,
-    product_namespace: ProductNamespace,
+    product_namespace: MfgBatchNamespace,
     owner: String,
     properties: Vec<PropertyValue>,
 }
 
-impl Product {
+impl MfgBatch {
     pub fn product_id(&self) -> &str {
         &self.product_id
     }
 
-    pub fn product_namespace(&self) -> &ProductNamespace {
+    pub fn product_namespace(&self) -> &MfgBatchNamespace {
         &self.product_namespace
     }
 
@@ -95,8 +95,8 @@ impl Product {
         &self.properties
     }
 
-    pub fn into_builder(self) -> ProductBuilder {
-        ProductBuilder::new()
+    pub fn into_builder(self) -> MfgBatchBuilder {
+        MfgBatchBuilder::new()
             .with_product_id(self.product_id)
             .with_product_namespace(self.product_namespace)
             .with_owner(self.owner)
@@ -104,11 +104,11 @@ impl Product {
     }
 }
 
-impl FromProto<protos::product_state::Product> for Product {
-    fn from_proto(product: protos::product_state::Product) -> Result<Self, ProtoConversionError> {
-        Ok(Product {
+impl FromProto<protos::mfg_batch_state::MfgBatch> for MfgBatch {
+    fn from_proto(product: protos::mfg_batch_state::MfgBatch) -> Result<Self, ProtoConversionError> {
+        Ok(MfgBatch {
             product_id: product.get_product_id().to_string(),
-            product_namespace: ProductNamespace::from_proto(product.get_product_namespace())?,
+            product_namespace: MfgBatchNamespace::from_proto(product.get_product_namespace())?,
             owner: product.get_owner().to_string(),
             properties: product
                 .get_properties()
@@ -120,9 +120,9 @@ impl FromProto<protos::product_state::Product> for Product {
     }
 }
 
-impl FromNative<Product> for protos::product_state::Product {
-    fn from_native(product: Product) -> Result<Self, ProtoConversionError> {
-        let mut proto = protos::product_state::Product::new();
+impl FromNative<MfgBatch> for protos::mfg_batch_state::MfgBatch {
+    fn from_native(product: MfgBatch) -> Result<Self, ProtoConversionError> {
+        let mut proto = protos::mfg_batch_state::MfgBatch::new();
         proto.set_product_id(product.product_id().to_string());
         proto.set_product_namespace(product.product_namespace().clone().into_proto()?);
         proto.set_owner(product.owner().to_string());
@@ -138,76 +138,76 @@ impl FromNative<Product> for protos::product_state::Product {
     }
 }
 
-impl FromBytes<Product> for Product {
-    fn from_bytes(bytes: &[u8]) -> Result<Product, ProtoConversionError> {
-        let proto: protos::product_state::Product =
+impl FromBytes<MfgBatch> for MfgBatch {
+    fn from_bytes(bytes: &[u8]) -> Result<MfgBatch, ProtoConversionError> {
+        let proto: protos::mfg_batch_state::MfgBatch =
             Message::parse_from_bytes(bytes).map_err(|_| {
                 ProtoConversionError::SerializationError(
-                    "Unable to get Product from bytes".to_string(),
+                    "Unable to get MfgBatch from bytes".to_string(),
                 )
             })?;
         proto.into_native()
     }
 }
 
-impl IntoBytes for Product {
+impl IntoBytes for MfgBatch {
     fn into_bytes(self) -> Result<Vec<u8>, ProtoConversionError> {
         let proto = self.into_proto()?;
         let bytes = proto.write_to_bytes().map_err(|_| {
-            ProtoConversionError::SerializationError("Unable to get bytes from Product".to_string())
+            ProtoConversionError::SerializationError("Unable to get bytes from MfgBatch".to_string())
         })?;
         Ok(bytes)
     }
 }
 
-impl IntoProto<protos::product_state::Product> for Product {}
-impl IntoNative<Product> for protos::product_state::Product {}
+impl IntoProto<protos::mfg_batch_state::MfgBatch> for MfgBatch {}
+impl IntoNative<MfgBatch> for protos::mfg_batch_state::MfgBatch {}
 
-/// Returned if any required fields in a `Product` are not present when being
+/// Returned if any required fields in a `MfgBatch` are not present when being
 /// converted from the corresponding builder
 #[derive(Debug)]
-pub enum ProductBuildError {
+pub enum MfgBatchBuildError {
     MissingField(String),
     EmptyVec(String),
 }
 
-impl StdError for ProductBuildError {
+impl StdError for MfgBatchBuildError {
     fn description(&self) -> &str {
         match *self {
-            ProductBuildError::MissingField(ref msg) => msg,
-            ProductBuildError::EmptyVec(ref msg) => msg,
+            MfgBatchBuildError::MissingField(ref msg) => msg,
+            MfgBatchBuildError::EmptyVec(ref msg) => msg,
         }
     }
 
     fn source(&self) -> Option<&(dyn StdError + 'static)> {
         match *self {
-            ProductBuildError::MissingField(_) => None,
-            ProductBuildError::EmptyVec(_) => None,
+            MfgBatchBuildError::MissingField(_) => None,
+            MfgBatchBuildError::EmptyVec(_) => None,
         }
     }
 }
 
-impl std::fmt::Display for ProductBuildError {
+impl std::fmt::Display for MfgBatchBuildError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match *self {
-            ProductBuildError::MissingField(ref s) => write!(f, "missing field \"{}\"", s),
-            ProductBuildError::EmptyVec(ref s) => write!(f, "\"{}\" must not be empty", s),
+            MfgBatchBuildError::MissingField(ref s) => write!(f, "missing field \"{}\"", s),
+            MfgBatchBuildError::EmptyVec(ref s) => write!(f, "\"{}\" must not be empty", s),
         }
     }
 }
 
-/// Builder used to create a `Product`
+/// Builder used to create a `MfgBatch`
 #[derive(Default, Clone, PartialEq)]
-pub struct ProductBuilder {
+pub struct MfgBatchBuilder {
     pub product_id: Option<String>,
-    pub product_namespace: Option<ProductNamespace>,
+    pub product_namespace: Option<MfgBatchNamespace>,
     pub owner: Option<String>,
     pub properties: Option<Vec<PropertyValue>>,
 }
 
-impl ProductBuilder {
+impl MfgBatchBuilder {
     pub fn new() -> Self {
-        ProductBuilder::default()
+        MfgBatchBuilder::default()
     }
 
     pub fn with_product_id(mut self, product_id: String) -> Self {
@@ -215,7 +215,7 @@ impl ProductBuilder {
         self
     }
 
-    pub fn with_product_namespace(mut self, product_namespace: ProductNamespace) -> Self {
+    pub fn with_product_namespace(mut self, product_namespace: MfgBatchNamespace) -> Self {
         self.product_namespace = Some(product_namespace);
         self
     }
@@ -230,25 +230,25 @@ impl ProductBuilder {
         self
     }
 
-    pub fn build(self) -> Result<Product, ProductBuildError> {
+    pub fn build(self) -> Result<MfgBatch, MfgBatchBuildError> {
         let product_id = self.product_id.ok_or_else(|| {
-            ProductBuildError::MissingField("'product_id' field is required".to_string())
+            MfgBatchBuildError::MissingField("'product_id' field is required".to_string())
         })?;
 
         let product_namespace = self.product_namespace.ok_or_else(|| {
-            ProductBuildError::MissingField("'product_namespace' field is required".to_string())
+            MfgBatchBuildError::MissingField("'product_namespace' field is required".to_string())
         })?;
 
         let owner = self.owner.ok_or_else(|| {
-            ProductBuildError::MissingField("'owner' field is required".to_string())
+            MfgBatchBuildError::MissingField("'owner' field is required".to_string())
         })?;
 
-        // Product values are not required
+        // MfgBatch values are not required
         let properties = self.properties.ok_or_else(|| {
-            ProductBuildError::MissingField("'properties' field is required".to_string())
+            MfgBatchBuildError::MissingField("'properties' field is required".to_string())
         })?;
 
-        Ok(Product {
+        Ok(MfgBatch {
             product_id,
             product_namespace,
             owner,
@@ -257,135 +257,135 @@ impl ProductBuilder {
     }
 }
 
-/// Native representation of a list of `Product`s
+/// Native representation of a list of `MfgBatch`s
 #[derive(Debug, Clone, PartialEq)]
-pub struct ProductList {
-    products: Vec<Product>,
+pub struct MfgBatchList {
+    products: Vec<MfgBatch>,
 }
 
-impl ProductList {
-    pub fn products(&self) -> &[Product] {
+impl MfgBatchList {
+    pub fn products(&self) -> &[MfgBatch] {
         &self.products
     }
 
-    pub fn into_builder(self) -> ProductListBuilder {
-        ProductListBuilder::new().with_products(self.products)
+    pub fn into_builder(self) -> MfgBatchListBuilder {
+        MfgBatchListBuilder::new().with_products(self.products)
     }
 }
 
-impl FromProto<protos::product_state::ProductList> for ProductList {
+impl FromProto<protos::mfg_batch_state::MfgBatchList> for MfgBatchList {
     fn from_proto(
-        product_list: protos::product_state::ProductList,
+        product_list: protos::mfg_batch_state::MfgBatchList,
     ) -> Result<Self, ProtoConversionError> {
-        Ok(ProductList {
+        Ok(MfgBatchList {
             products: product_list
                 .get_entries()
                 .to_vec()
                 .into_iter()
-                .map(Product::from_proto)
-                .collect::<Result<Vec<Product>, ProtoConversionError>>()?,
+                .map(MfgBatch::from_proto)
+                .collect::<Result<Vec<MfgBatch>, ProtoConversionError>>()?,
         })
     }
 }
 
-impl FromNative<ProductList> for protos::product_state::ProductList {
-    fn from_native(product_list: ProductList) -> Result<Self, ProtoConversionError> {
-        let mut product_list_proto = protos::product_state::ProductList::new();
+impl FromNative<MfgBatchList> for protos::mfg_batch_state::MfgBatchList {
+    fn from_native(product_list: MfgBatchList) -> Result<Self, ProtoConversionError> {
+        let mut product_list_proto = protos::mfg_batch_state::MfgBatchList::new();
 
         product_list_proto.set_entries(RepeatedField::from_vec(
             product_list
                 .products()
                 .to_vec()
                 .into_iter()
-                .map(Product::into_proto)
-                .collect::<Result<Vec<protos::product_state::Product>, ProtoConversionError>>()?,
+                .map(MfgBatch::into_proto)
+                .collect::<Result<Vec<protos::mfg_batch_state::MfgBatch>, ProtoConversionError>>()?,
         ));
 
         Ok(product_list_proto)
     }
 }
 
-impl FromBytes<ProductList> for ProductList {
-    fn from_bytes(bytes: &[u8]) -> Result<ProductList, ProtoConversionError> {
-        let proto: protos::product_state::ProductList =
+impl FromBytes<MfgBatchList> for MfgBatchList {
+    fn from_bytes(bytes: &[u8]) -> Result<MfgBatchList, ProtoConversionError> {
+        let proto: protos::mfg_batch_state::MfgBatchList =
             Message::parse_from_bytes(bytes).map_err(|_| {
                 ProtoConversionError::SerializationError(
-                    "Unable to get ProductList from bytes".to_string(),
+                    "Unable to get MfgBatchList from bytes".to_string(),
                 )
             })?;
         proto.into_native()
     }
 }
 
-impl IntoBytes for ProductList {
+impl IntoBytes for MfgBatchList {
     fn into_bytes(self) -> Result<Vec<u8>, ProtoConversionError> {
         let proto = self.into_proto()?;
         let bytes = proto.write_to_bytes().map_err(|_| {
             ProtoConversionError::SerializationError(
-                "Unable to get bytes from ProductList".to_string(),
+                "Unable to get bytes from MfgBatchList".to_string(),
             )
         })?;
         Ok(bytes)
     }
 }
 
-impl IntoProto<protos::product_state::ProductList> for ProductList {}
-impl IntoNative<ProductList> for protos::product_state::ProductList {}
+impl IntoProto<protos::mfg_batch_state::MfgBatchList> for MfgBatchList {}
+impl IntoNative<MfgBatchList> for protos::mfg_batch_state::MfgBatchList {}
 
-/// Returned if any required fields in a `ProductList` are not present when being
+/// Returned if any required fields in a `MfgBatchList` are not present when being
 /// converted from the corresponding builder
 #[derive(Debug)]
-pub enum ProductListBuildError {
+pub enum MfgBatchListBuildError {
     MissingField(String),
 }
 
-impl StdError for ProductListBuildError {
+impl StdError for MfgBatchListBuildError {
     fn description(&self) -> &str {
         match *self {
-            ProductListBuildError::MissingField(ref msg) => msg,
+            MfgBatchListBuildError::MissingField(ref msg) => msg,
         }
     }
 
     fn source(&self) -> Option<&(dyn StdError + 'static)> {
         match *self {
-            ProductListBuildError::MissingField(_) => None,
+            MfgBatchListBuildError::MissingField(_) => None,
         }
     }
 }
 
-impl std::fmt::Display for ProductListBuildError {
+impl std::fmt::Display for MfgBatchListBuildError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match *self {
-            ProductListBuildError::MissingField(ref s) => write!(f, "missing field \"{}\"", s),
+            MfgBatchListBuildError::MissingField(ref s) => write!(f, "missing field \"{}\"", s),
         }
     }
 }
 
-/// Builder used to create a `ProductList`
+/// Builder used to create a `MfgBatchList`
 #[derive(Default, Clone)]
-pub struct ProductListBuilder {
-    pub products: Option<Vec<Product>>,
+pub struct MfgBatchListBuilder {
+    pub products: Option<Vec<MfgBatch>>,
 }
 
-impl ProductListBuilder {
+impl MfgBatchListBuilder {
     pub fn new() -> Self {
-        ProductListBuilder::default()
+        MfgBatchListBuilder::default()
     }
 
-    pub fn with_products(mut self, products: Vec<Product>) -> ProductListBuilder {
+    pub fn with_products(mut self, products: Vec<MfgBatch>) -> MfgBatchListBuilder {
         self.products = Some(products);
         self
     }
 
-    pub fn build(self) -> Result<ProductList, ProductListBuildError> {
-        // Product values are not required
+    pub fn build(self) -> Result<MfgBatchList, MfgBatchListBuildError> {
+        // MfgBatch values are not required
         let products = self.products.ok_or_else(|| {
-            ProductListBuildError::MissingField("'products' field is required".to_string())
+            MfgBatchListBuildError::MissingField("'products' field is required".to_string())
         })?;
 
         let products = {
             if products.is_empty() {
-                return Err(ProductListBuildError::MissingField(
+                return Err(MfgBatchListBuildError::MissingField(
                     "'products' cannot be empty".to_string(),
                 ));
             } else {
@@ -393,7 +393,7 @@ impl ProductListBuilder {
             }
         };
 
-        Ok(ProductList { products })
+        Ok(MfgBatchList { products })
     }
 }
 /*
@@ -404,12 +404,12 @@ mod tests {
     use std::fmt::Debug;
 
     #[test]
-    /// Validate that a `Product` may be built correctly
+    /// Validate that a `MfgBatch` may be built correctly
     fn test_product_builder() {
         let product = build_product();
 
         assert_eq!(product.product_id(), "688955434684");
-        assert_eq!(*product.product_namespace(), ProductNamespace::Gs1);
+        assert_eq!(*product.product_namespace(), MfgBatchNamespace::Gs1);
         assert_eq!(product.owner(), "Target");
         assert_eq!(product.properties()[0].name(), "description");
         assert_eq!(*product.properties()[0].data_type(), DataType::String);
@@ -423,36 +423,36 @@ mod tests {
     }
 
     #[test]
-    /// Validate that a `Product` may be correctly converted back to its respective builder
+    /// Validate that a `MfgBatch` may be correctly converted back to its respective builder
     fn test_product_into_builder() {
         let product = build_product();
 
         let builder = product.into_builder();
 
         assert_eq!(builder.product_id, Some("688955434684".to_string()));
-        assert_eq!(builder.product_namespace, Some(ProductNamespace::Gs1));
+        assert_eq!(builder.product_namespace, Some(MfgBatchNamespace::Gs1));
         assert_eq!(builder.owner, Some("Target".to_string()));
         assert_eq!(builder.properties, Some(make_properties()));
     }
 
     #[test]
-    /// Validate that a `Product` may be correctly converted into bytes and then back to its native
+    /// Validate that a `MfgBatch` may be correctly converted into bytes and then back to its native
     /// representation
     fn test_product_into_bytes() {
-        let builder = ProductBuilder::new();
+        let builder = MfgBatchBuilder::new();
         let original = builder
             .with_product_id("688955434684".into())
-            .with_product_namespace(ProductNamespace::Gs1)
+            .with_product_namespace(MfgBatchNamespace::Gs1)
             .with_owner("Target".into())
             .with_properties(make_properties())
             .build()
             .unwrap();
 
-        test_from_bytes(original, Product::from_bytes);
+        test_from_bytes(original, MfgBatch::from_bytes);
     }
 
     #[test]
-    /// Validate that a list of products, `ProductList`, can be built correctly
+    /// Validate that a list of products, `MfgBatchList`, can be built correctly
     fn test_product_list_builder() {
         let product_list = build_product_list();
 
@@ -462,7 +462,7 @@ mod tests {
         assert_eq!(product_list.products[0].product_id(), "688955434684");
         assert_eq!(
             *product_list.products[0].product_namespace(),
-            ProductNamespace::Gs1
+            MfgBatchNamespace::Gs1
         );
         assert_eq!(product_list.products[0].owner(), "Target");
         assert_eq!(
@@ -488,7 +488,7 @@ mod tests {
         assert_eq!(product_list.products[1].product_id(), "688955434685");
         assert_eq!(
             *product_list.products[1].product_namespace(),
-            ProductNamespace::Gs1
+            MfgBatchNamespace::Gs1
         );
         assert_eq!(product_list.products[1].owner(), "Cargill");
         assert_eq!(
@@ -512,7 +512,7 @@ mod tests {
     }
 
     #[test]
-    /// Validate that a `ProductList` can be correctly converted back to a builder
+    /// Validate that a `MfgBatchList` can be correctly converted back to a builder
     fn test_product_list_into_builder() {
         let product_list = build_product_list();
 
@@ -522,19 +522,19 @@ mod tests {
     }
 
     #[test]
-    /// Validate that a `ProductList` can be converted into bytes and back to its native
+    /// Validate that a `MfgBatchList` can be converted into bytes and back to its native
     /// representation successfully
     fn test_product_list_into_bytes() {
-        let builder = ProductListBuilder::new();
+        let builder = MfgBatchListBuilder::new();
         let original = builder.with_products(make_products()).build().unwrap();
 
-        test_from_bytes(original, ProductList::from_bytes);
+        test_from_bytes(original, MfgBatchList::from_bytes);
     }
 
-    fn build_product() -> Product {
-        ProductBuilder::new()
+    fn build_product() -> MfgBatch {
+        MfgBatchBuilder::new()
             .with_product_id("688955434684".into()) // GTIN-12
-            .with_product_namespace(ProductNamespace::Gs1)
+            .with_product_namespace(MfgBatchNamespace::Gs1)
             .with_owner("Target".into())
             .with_properties(make_properties())
             .build()
@@ -561,25 +561,25 @@ mod tests {
         ]
     }
 
-    fn build_product_list() -> ProductList {
-        ProductListBuilder::new()
+    fn build_product_list() -> MfgBatchList {
+        MfgBatchListBuilder::new()
             .with_products(make_products())
             .build()
             .expect("Failed to build test product list")
     }
 
-    fn make_products() -> Vec<Product> {
+    fn make_products() -> Vec<MfgBatch> {
         vec![
-            ProductBuilder::new()
+            MfgBatchBuilder::new()
                 .with_product_id("688955434684".into()) // GTIN-12
-                .with_product_namespace(ProductNamespace::Gs1)
+                .with_product_namespace(MfgBatchNamespace::Gs1)
                 .with_owner("Target".into())
                 .with_properties(make_properties())
                 .build()
                 .expect("Failed to build test product"),
-            ProductBuilder::new()
+            MfgBatchBuilder::new()
                 .with_product_id("688955434685".into()) // GTIN-12
-                .with_product_namespace(ProductNamespace::Gs1)
+                .with_product_namespace(MfgBatchNamespace::Gs1)
                 .with_owner("Cargill".into())
                 .with_properties(make_properties())
                 .build()

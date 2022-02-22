@@ -56,8 +56,6 @@ pub mod protocol;
 pub mod protos;
 #[cfg(feature = "mfg_batch")]
 pub mod mfg_batch;
-pub mod protocol;
-pub mod protos;
 #[cfg(feature = "purchase-order")]
 pub mod purchase_order;
 #[cfg(feature = "rest-api")]
