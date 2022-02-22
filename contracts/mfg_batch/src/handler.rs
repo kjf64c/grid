@@ -13,6 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
+// MFG_BTCH
 cfg_if! {
     if #[cfg(target_arch = "wasm32")] {
         use sabre_sdk::ApplyError;
@@ -92,7 +94,7 @@ impl MfgBatchTransactionHandler {
     ) -> Result<(), ApplyError> {
         let mfg_batch_id = payload.mfg_batch_id();
         let owner = payload.owner();
-        let product_namespace = payload.product_namespace();
+        let mfg_batch_namespace = payload.mfg_batch_namespace();
         let properties = payload.properties();
 
         // Check signing agent's permission
@@ -103,7 +105,7 @@ impl MfgBatchTransactionHandler {
             owner,
         )?;
 
-        // Check if product exists in state
+        // Check if mfg_batch exists in state
         if state.get_mfg_batch(mfg_batch_id)?.is_some() {
             return Err(ApplyError::InvalidTransaction(format!(
                 "Product already exists: {}",
@@ -111,14 +113,14 @@ impl MfgBatchTransactionHandler {
             )));
         }
 
-        // Check if the product namespace is a GS1 product
+        // Check if the mfg_batch namespace is a GS1 mfg_batch
         if mfg_batch_namespace != &MfgBatchNamespace::Gs1 {
             return Err(ApplyError::InvalidTransaction(
-                "Invalid product namespace enum for product".to_string(),
+                "Invalid mfg_batch namespace enum for mfg_batch".to_string(),
             ));
         }
 
-        // Check if product mfg_batch_id is a valid gtin
+        // Check if mfg_batch mfg_batch_id is a valid gtin
         if let Err(e) = validate_gtin(mfg_batch_id) {
             return Err(ApplyError::InvalidTransaction(e.to_string()));
         }
@@ -161,15 +163,15 @@ impl MfgBatchTransactionHandler {
 
         if payload.mfg_batch_namespace() == &MfgBatchNamespace::Gs1 {
             // Check if gs1 schema exists
-            let schema = if let Some(schema) = state.get_schema("gs1_product")? {
+            let schema = if let Some(schema) = state.get_schema("gs1_mfg_batch")? {
                 schema
             } else {
                 return Err(ApplyError::InvalidTransaction(
-                    "gs1_product schema has not been defined".into(),
+                    "gs1_mfg_batch schema has not been defined".into(),
                 ));
             };
 
-            // Check if properties in product are all a part of the gs1 schema
+            // Check if properties in mfg_batch are all a part of the gs1 schema
             for property in payload.properties() {
                 if schema
                     .properties()
@@ -199,22 +201,22 @@ impl MfgBatchTransactionHandler {
             }
         }
 
-        let new_product = MfgBatchBuilder::new()
+        let new_mfg_batch = MfgBatchBuilder::new()
             .with_mfg_batch_id(mfg_batch_id.to_string())
             .with_owner(owner.to_string())
             .with_mfg_batch_namespace(mfg_batch_namespace.clone())
             .with_properties(properties.to_vec())
             .build()
             .map_err(|err| {
-                ApplyError::InvalidTransaction(format!("Cannot build product: {}", err))
+                ApplyError::InvalidTransaction(format!("Cannot build mfg_batch: {}", err))
             })?;
 
-        state.set_mfg_batch(mfg_batch_id, new_product)?;
+        state.set_mfg_batch(mfg_batch_id, new_mfg_batch)?;
 
         Ok(())
     }
 
-    fn update_product(
+    fn update_mfg_batch(
         &self,
         payload: &MfgBatchUpdateAction,
         state: &mut MfgBatchState,
@@ -225,18 +227,18 @@ impl MfgBatchTransactionHandler {
         let mfg_batch_namespace = payload.mfg_batch_namespace();
         let properties = payload.properties();
 
-        // Check if the product namespace is a GS1 product
+        // Check if the mfg_batch namespace is a GS1 mfg_batch
         if mfg_batch_namespace != &MfgBatchNamespace::Gs1 {
             return Err(ApplyError::InvalidTransaction(
-                "Invalid product namespace enum for product".to_string(),
+                "Invalid mfg_batch namespace enum for mfg_batch".to_string(),
             ));
         }
 
-        // Check if product exists
-        let product = match state.get_product(mfg_batch_id) {
-            Ok(Some(product)) => Ok(product),
+        // Check if mfg_batch exists
+        let mfg_batch = match state.get_mfg_batch(mfg_batch_id) {
+            Ok(Some(mfg_batch)) => Ok(mfg_batch),
             Ok(None) => Err(ApplyError::InvalidTransaction(format!(
-                "No product exists: {}",
+                "No mfg_batch exists: {}",
                 mfg_batch_id
             ))),
             Err(err) => Err(err),
@@ -247,25 +249,25 @@ impl MfgBatchTransactionHandler {
             perm_checker,
             signer,
             &permission_to_perm_string(Permission::CanUpdateMfgBatch),
-            product.owner(),
+            mfg_batch.owner(),
         )?;
 
-        // Check if product mfg_batch_id is a valid gtin
+        // Check if mfg_batch mfg_batch_id is a valid gtin
         if let Err(e) = validate_gtin(mfg_batch_id) {
             return Err(ApplyError::InvalidTransaction(e.to_string()));
         }
 
-        if payload.product_namespace() == &MfgBatchNamespace::Gs1 {
+        if payload.mfg_batch_namespace() == &MfgBatchNamespace::Gs1 {
             // Check if gs1 schema exists
-            let schema = if let Some(schema) = state.get_schema("gs1_product")? {
+            let schema = if let Some(schema) = state.get_schema("gs1_mfg_batch")? {
                 schema
             } else {
                 return Err(ApplyError::InvalidTransaction(
-                    "gs1_product schema has not been defined".into(),
+                    "gs1_mfg_batch schema has not been defined".into(),
                 ));
             };
 
-            // Check if properties in product are all a part of the gs1 schema
+            // Check if properties in mfg_batch are all a part of the gs1 schema
             for property in payload.properties() {
                 if schema
                     .properties()
@@ -295,23 +297,23 @@ impl MfgBatchTransactionHandler {
             }
         }
 
-        // Handle updating the product
-        let updated_product = MfgBatchBuilder::new()
+        // Handle updating the mfg_batch
+        let updated_mfg_batch = MfgBatchBuilder::new()
             .with_mfg_batch_id(mfg_batch_id.to_string())
-            .with_owner(product.owner().to_string())
-            .with_product_namespace(product_namespace.clone())
+            .with_owner(mfg_batch.owner().to_string())
+            .with_mfg_batch_namespace(mfg_batch_namespace.clone())
             .with_properties(properties.to_vec())
             .build()
             .map_err(|err| {
-                ApplyError::InvalidTransaction(format!("Cannot build product: {}", err))
+                ApplyError::InvalidTransaction(format!("Cannot build mfg_batch: {}", err))
             })?;
 
-        state.set_product(mfg_batch_id, updated_product)?;
+        state.set_mfg_batch(mfg_batch_id, updated_mfg_batch)?;
 
         Ok(())
     }
 
-    fn delete_product(
+    fn delete_mfg_batch(
         &self,
         payload: &MfgBatchDeleteAction,
         state: &mut MfgBatchState,
@@ -319,20 +321,20 @@ impl MfgBatchTransactionHandler {
         perm_checker: &PermissionChecker,
     ) -> Result<(), ApplyError> {
         let mfg_batch_id = payload.mfg_batch_id();
-        let product_namespace = payload.product_namespace();
+        let mfg_batch_namespace = payload.mfg_batch_namespace();
 
-        // Check if the product namespace is a GS1 product
-        if product_namespace != &MfgBatchNamespace::Gs1 {
+        // Check if the mfg_batch namespace is a GS1 mfg_batch
+        if mfg_batch_namespace != &MfgBatchNamespace::Gs1 {
             return Err(ApplyError::InvalidTransaction(
-                "Invalid product namespace enum for product".to_string(),
+                "Invalid mfg_batch namespace enum for mfg_batch".to_string(),
             ));
         }
 
-        // Check if product exists in state
-        let product = match state.get_mfg_batch(mfg_batch_id) {
-            Ok(Some(product)) => Ok(product),
+        // Check if mfg_batch exists in state
+        let mfg_batch = match state.get_mfg_batch(mfg_batch_id) {
+            Ok(Some(mfg_batch)) => Ok(mfg_batch),
             Ok(None) => Err(ApplyError::InvalidTransaction(format!(
-                "No product exists: {}",
+                "No mfg_batch exists: {}",
                 mfg_batch_id
             ))),
             Err(err) => Err(err),
@@ -343,15 +345,15 @@ impl MfgBatchTransactionHandler {
             perm_checker,
             signer,
             &permission_to_perm_string(Permission::CanDeleteMfgBatch),
-            product.owner(),
+            mfg_batch.owner(),
         )?;
 
-        // Check if product mfg_batch_id is a valid gtin
+        // Check if mfg_batch mfg_batch_id is a valid gtin
         if let Err(e) = validate_gtin(mfg_batch_id) {
             return Err(ApplyError::InvalidTransaction(e.to_string()));
         }
 
-        // Delete the product
+        // Delete the mfg_batch
         state.remove_mfg_batch(mfg_batch_id)?;
         Ok(())
     }
@@ -395,11 +397,11 @@ impl TransactionHandler for MfgBatchTransactionHandler {
             Action::MfgBatchCreate(create_mfg_batch_payload) => {
                 self.create_mfg_batch(create_mfg_batch_payload, &mut state, signer, &perm_checker)?
             }
-            Action::MfgBatchUpdate(update_product_payload) => {
-                self.update_product(update_product_payload, &mut state, signer, &perm_checker)?
+            Action::MfgBatchUpdate(update_mfg_batch_payload) => {
+                self.update_mfg_batch(update_mfg_batch_payload, &mut state, signer, &perm_checker)?
             }
-            Action::MfgBatchDelete(delete_product_payload) => {
-                self.delete_product(delete_product_payload, &mut state, signer, &perm_checker)?
+            Action::MfgBatchDelete(delete_mfg_batch_payload) => {
+                self.delete_mfg_batch(delete_mfg_batch_payload, &mut state, signer, &perm_checker)?
             }
         }
         Ok(())
@@ -438,13 +440,13 @@ mod tests {
         pike::addressing::{
             compute_agent_address, compute_organization_address, compute_role_address,
         },
-        product::addressing::compute_gs1_product_address,
+        mfg_batch::addressing::compute_gs1_mfg_batch_address,
         protocol::{
             pike::state::{
                 AgentBuilder, AgentListBuilder, AlternateIdBuilder, OrganizationBuilder,
                 OrganizationListBuilder, RoleBuilder, RoleListBuilder,
             },
-            product::{
+            mfg_batch::{
                 payload::{
                     MfgBatchCreateAction, MfgBatchCreateActionBuilder, MfgBatchDeleteAction,
                     MfgBatchDeleteActionBuilder, MfgBatchUpdateAction, MfgBatchUpdateActionBuilder,
@@ -464,7 +466,7 @@ mod tests {
 
     const AGENT_ORG_ID: &str = "test_org";
     const PUBLIC_KEY: &str = "test_public_key";
-    const ROLE_NAME: &str = "product_roles";
+    const ROLE_NAME: &str = "mfg_batch_roles";
     const MFG_BATCH_ID: &str = "688955434684";
     const PRODUCT_2_ID: &str = "9781981855728";
 
@@ -560,9 +562,9 @@ mod tests {
                 .with_name(ROLE_NAME.to_string())
                 .with_description("role description".to_string())
                 .with_permissions(vec![
-                    "product::can-create-product".to_string(),
-                    "product::can-update-product".to_string(),
-                    "product::can-delete-product".to_string(),
+                    "mfg_batch::can-create-mfg_batch".to_string(),
+                    "mfg_batch::can-update-mfg_batch".to_string(),
+                    "mfg_batch::can-delete-mfg_batch".to_string(),
                 ])
                 .build()
                 .unwrap();
@@ -576,7 +578,7 @@ mod tests {
 
         fn add_org(&self, org_id: &str) {
             // Products can only be created when there is a gs1 prefix
-            // within the product organization's metadata
+            // within the mfg_batch organization's metadata
             let alternate_id = AlternateIdBuilder::new()
                 .with_id_type("gs1_company_prefix".to_string())
                 .with_id("6889".to_string())
@@ -620,29 +622,29 @@ mod tests {
             self.set_state_entry(org_address, org_bytes).unwrap();
         }
 
-        fn add_product(&self, prod_id: &str) {
-            let product_list = ProductListBuilder::new()
-                .with_products(vec![make_product()])
+        fn add_mfg_batch(&self, prod_id: &str) {
+            let mfg_batch_list = ProductListBuilder::new()
+                .with_mfg_batchs(vec![make_mfg_batch()])
                 .build()
                 .unwrap();
-            let product_bytes = product_list.into_bytes().unwrap();
-            let product_address = compute_gs1_product_address(prod_id);
-            self.set_state_entry(product_address, product_bytes)
+            let mfg_batch_bytes = mfg_batch_list.into_bytes().unwrap();
+            let mfg_batch_address = compute_gs1_mfg_batch_address(prod_id);
+            self.set_state_entry(mfg_batch_address, mfg_batch_bytes)
                 .unwrap();
         }
 
-        fn add_products(&self, product_ids: &[&str]) {
-            let product_list = ProductListBuilder::new()
-                .with_products(make_products(product_ids))
+        fn add_mfg_batchs(&self, mfg_batch_ids: &[&str]) {
+            let mfg_batch_list = ProductListBuilder::new()
+                .with_mfg_batchs(make_mfg_batchs(mfg_batch_ids))
                 .build()
                 .unwrap();
-            let product_list_bytes = product_list.into_bytes().unwrap();
-            let product_list_bytes_copy = product_list_bytes.clone();
-            let product_1_address = compute_gs1_product_address(PRODUCT_ID);
-            let product_2_address = compute_gs1_product_address(PRODUCT_2_ID);
+            let mfg_batch_list_bytes = mfg_batch_list.into_bytes().unwrap();
+            let mfg_batch_list_bytes_copy = mfg_batch_list_bytes.clone();
+            let mfg_batch_1_address = compute_gs1_mfg_batch_address(PRODUCT_ID);
+            let mfg_batch_2_address = compute_gs1_mfg_batch_address(PRODUCT_2_ID);
             self.set_state_entries(vec![
-                (product_1_address, product_list_bytes),
-                (product_2_address, product_list_bytes_copy),
+                (mfg_batch_1_address, mfg_batch_list_bytes),
+                (mfg_batch_2_address, mfg_batch_list_bytes_copy),
             ])
             .unwrap();
         }
@@ -665,8 +667,8 @@ mod tests {
             ];
 
             let schema = SchemaBuilder::new()
-                .with_name("gs1_product".into())
-                .with_description("GS1 product".into())
+                .with_name("gs1_mfg_batch".into())
+                .with_description("GS1 mfg_batch".into())
                 .with_owner(AGENT_ORG_ID.to_string())
                 .with_properties(properties)
                 .build()
@@ -678,7 +680,7 @@ mod tests {
                 .unwrap();
 
             self.set_state_entries(vec![(
-                compute_schema_address("gs1_product"),
+                compute_schema_address("gs1_mfg_batch"),
                 schema_list.into_bytes().unwrap(),
             )])
             .unwrap();
@@ -697,10 +699,10 @@ mod tests {
         let mut state = MfgBatchState::new(&transaction_context);
 
         let transaction_handler = MfgBatchTransactionHandler::new();
-        let product_create_action = make_product_create_action();
+        let mfg_batch_create_action = make_mfg_batch_create_action();
 
         match transaction_handler.create_mfg_batch(
-            &product_create_action,
+            &mfg_batch_create_action,
             &mut state,
             PUBLIC_KEY,
             &perm_checker,
@@ -712,12 +714,12 @@ mod tests {
             Err(err) => panic!("Should have gotten internal error but got {}", err),
         }
 
-        let product = state
-            .get_product(PRODUCT_ID)
-            .expect("Failed to fetch product")
-            .expect("No product found");
+        let mfg_batch = state
+            .get_mfg_batch(PRODUCT_ID)
+            .expect("Failed to fetch mfg_batch")
+            .expect("No mfg_batch found");
 
-        assert_eq!(product, make_product());
+        assert_eq!(mfg_batch, make_mfg_batch());
     }
 
     #[test]
@@ -729,10 +731,10 @@ mod tests {
         let mut state = MfgBatchState::new(&transaction_context);
 
         let transaction_handler = MfgBatchTransactionHandler::new();
-        let product_create_action = make_product_create_action();
+        let mfg_batch_create_action = make_mfg_batch_create_action();
 
         match transaction_handler.create_mfg_batch(
-            &product_create_action,
+            &mfg_batch_create_action,
             &mut state,
             PUBLIC_KEY,
             &perm_checker,
@@ -741,7 +743,7 @@ mod tests {
                 "Agent's organization should not exist, InvalidTransaction should be returned"
             ),
             Err(ApplyError::InvalidTransaction(err)) => {
-                assert_eq!("The signer \"test_public_key\" does not have the \"product::can-create-product\" permission for org \"test_org\"", err);
+                assert_eq!("The signer \"test_public_key\" does not have the \"mfg_batch::can-create-mfg_batch\" permission for org \"test_org\"", err);
             }
             Err(err) => panic!("Should have gotten invalid error but go {}", err),
         }
@@ -759,10 +761,10 @@ mod tests {
         let mut state = MfgBatchState::new(&transaction_context);
 
         let transaction_handler = MfgBatchTransactionHandler::new();
-        let product_create_action = make_product_create_action();
+        let mfg_batch_create_action = make_mfg_batch_create_action();
 
         match transaction_handler.create_mfg_batch(
-            &product_create_action,
+            &mfg_batch_create_action,
             &mut state,
             PUBLIC_KEY,
             &perm_checker
@@ -776,22 +778,22 @@ mod tests {
     }
 
     #[test]
-    /// Test that ProductCreationAction is invalid if the a product with the same id
+    /// Test that ProductCreationAction is invalid if the a mfg_batch with the same id
     /// already exists.
     fn test_create_mfg_batch_already_exist() {
         let transaction_context = MockTransactionContext::default();
         transaction_context.add_agent(PUBLIC_KEY);
         transaction_context.add_org(AGENT_ORG_ID);
         transaction_context.add_role();
-        transaction_context.add_product(PRODUCT_ID);
+        transaction_context.add_mfg_batch(PRODUCT_ID);
         let perm_checker = PermissionChecker::new(&transaction_context);
         let mut state = MfgBatchState::new(&transaction_context);
 
         let transaction_handler = MfgBatchTransactionHandler::new();
-        let product_create_action = make_product_create_action();
+        let mfg_batch_create_action = make_mfg_batch_create_action();
 
         match transaction_handler.create_mfg_batch(
-            &product_create_action,
+            &mfg_batch_create_action,
             &mut state,
             PUBLIC_KEY,
             &perm_checker,
@@ -806,21 +808,21 @@ mod tests {
 
     #[test]
     /// Test that if MfgBatchUpdateAction is valid an OK is returned and a Product is updated in state
-    fn test_update_product_handler_valid() {
+    fn test_update_mfg_batch_handler_valid() {
         let transaction_context = MockTransactionContext::default();
         transaction_context.add_agent(PUBLIC_KEY);
         transaction_context.add_org(AGENT_ORG_ID);
         transaction_context.add_role();
         transaction_context.add_gs1_schema();
-        transaction_context.add_product(PRODUCT_ID);
+        transaction_context.add_mfg_batch(PRODUCT_ID);
         let perm_checker = PermissionChecker::new(&transaction_context);
         let mut state = MfgBatchState::new(&transaction_context);
 
         let transaction_handler = MfgBatchTransactionHandler::new();
-        let product_update_action = make_product_update_action();
+        let mfg_batch_update_action = make_mfg_batch_update_action();
 
-        match transaction_handler.update_product(
-            &product_update_action,
+        match transaction_handler.update_mfg_batch(
+            &mfg_batch_update_action,
             &mut state,
             PUBLIC_KEY,
             &perm_checker,
@@ -832,34 +834,34 @@ mod tests {
             Err(err) => panic!("Should have gotten internal error but got {}", err),
         }
 
-        let product = state
-            .get_product(PRODUCT_ID)
-            .expect("Failed to fetch product")
-            .expect("No product found");
+        let mfg_batch = state
+            .get_mfg_batch(PRODUCT_ID)
+            .expect("Failed to fetch mfg_batch")
+            .expect("No mfg_batch found");
 
-        assert_eq!(product, make_updated_product());
+        assert_eq!(mfg_batch, make_updated_mfg_batch());
     }
 
     #[test]
-    /// Test that MfgBatchUpdateAction is invalid if there is no product to update
-    fn test_update_product_that_does_not_exist() {
+    /// Test that MfgBatchUpdateAction is invalid if there is no mfg_batch to update
+    fn test_update_mfg_batch_that_does_not_exist() {
         let transaction_context = MockTransactionContext::default();
         transaction_context.add_agent(PUBLIC_KEY);
         let perm_checker = PermissionChecker::new(&transaction_context);
         let mut state = MfgBatchState::new(&transaction_context);
 
         let transaction_handler = MfgBatchTransactionHandler::new();
-        let product_update_action = make_product_update_action();
+        let mfg_batch_update_action = make_mfg_batch_update_action();
 
-        match transaction_handler.update_product(
-            &product_update_action,
+        match transaction_handler.update_mfg_batch(
+            &mfg_batch_update_action,
             &mut state,
             PUBLIC_KEY,
             &perm_checker,
         ) {
             Ok(()) => panic!("Product should not exist, InvalidTransaction should be returned"),
             Err(ApplyError::InvalidTransaction(err)) => {
-                assert!(err.contains(&format!("No product exists: {}", PRODUCT_ID)));
+                assert!(err.contains(&format!("No mfg_batch exists: {}", PRODUCT_ID)));
             }
             Err(err) => panic!("Should have gotten invalid error but go {}", err),
         }
@@ -867,88 +869,88 @@ mod tests {
 
     #[test]
     /// Test that if MfgBatchDeleteAction is valid an OK is returned and a Product is deleted from state
-    fn test_delete_product_handler_valid() {
+    fn test_delete_mfg_batch_handler_valid() {
         let transaction_context = MockTransactionContext::default();
         transaction_context.add_agent(PUBLIC_KEY);
         transaction_context.add_org(AGENT_ORG_ID);
         transaction_context.add_role();
         transaction_context.add_gs1_schema();
-        transaction_context.add_products(&vec![PRODUCT_ID, PRODUCT_2_ID]);
+        transaction_context.add_mfg_batchs(&vec![PRODUCT_ID, PRODUCT_2_ID]);
         let perm_checker = PermissionChecker::new(&transaction_context);
         let mut state = MfgBatchState::new(&transaction_context);
 
         let transaction_handler = MfgBatchTransactionHandler::new();
-        let product_delete_action = make_product_delete_action(PRODUCT_ID);
+        let mfg_batch_delete_action = make_mfg_batch_delete_action(PRODUCT_ID);
 
         assert!(transaction_handler
-            .delete_product(
-                &product_delete_action,
+            .delete_mfg_batch(
+                &mfg_batch_delete_action,
                 &mut state,
                 PUBLIC_KEY,
                 &perm_checker
             )
             .is_ok());
 
-        let product = state.get_product(PRODUCT_ID).expect("No product found");
+        let mfg_batch = state.get_mfg_batch(PRODUCT_ID).expect("No mfg_batch found");
 
-        assert_eq!(product, None);
+        assert_eq!(mfg_batch, None);
     }
 
     #[test]
     /// Test that if MfgBatchDeleteAction is valid an OK is returned and a
-    /// second product is deleted from state
-    fn test_delete_second_product_handler_valid() {
+    /// second mfg_batch is deleted from state
+    fn test_delete_second_mfg_batch_handler_valid() {
         let transaction_context = MockTransactionContext::default();
         transaction_context.add_agent(PUBLIC_KEY);
         transaction_context.add_org(AGENT_ORG_ID);
         transaction_context.add_role();
         transaction_context.add_gs1_schema();
-        transaction_context.add_products(&vec![PRODUCT_ID, PRODUCT_2_ID]);
+        transaction_context.add_mfg_batchs(&vec![PRODUCT_ID, PRODUCT_2_ID]);
         let perm_checker = PermissionChecker::new(&transaction_context);
         let mut state = MfgBatchState::new(&transaction_context);
 
         let transaction_handler = MfgBatchTransactionHandler::new();
-        let product_delete_action = make_product_delete_action(PRODUCT_2_ID);
+        let mfg_batch_delete_action = make_mfg_batch_delete_action(PRODUCT_2_ID);
 
         assert!(transaction_handler
-            .delete_product(
-                &product_delete_action,
+            .delete_mfg_batch(
+                &mfg_batch_delete_action,
                 &mut state,
                 PUBLIC_KEY,
                 &perm_checker,
             )
             .is_ok());
 
-        let product = state.get_product(PRODUCT_2_ID).expect("No product found");
+        let mfg_batch = state.get_mfg_batch(PRODUCT_2_ID).expect("No mfg_batch found");
 
-        assert_eq!(product, None);
+        assert_eq!(mfg_batch, None);
     }
 
     #[test]
-    /// Test that MfgBatchDeleteAction is invalid if the agent does not have can_delete_product role
-    fn test_delete_product_agent_without_roles() {
+    /// Test that MfgBatchDeleteAction is invalid if the agent does not have can_delete_mfg_batch role
+    fn test_delete_mfg_batch_agent_without_roles() {
         let transaction_context = MockTransactionContext::default();
         transaction_context.add_agent_without_roles(PUBLIC_KEY);
         transaction_context.add_org(AGENT_ORG_ID);
-        transaction_context.add_products(&vec![PRODUCT_ID, PRODUCT_2_ID]);
+        transaction_context.add_mfg_batchs(&vec![PRODUCT_ID, PRODUCT_2_ID]);
         let perm_checker = PermissionChecker::new(&transaction_context);
         let mut state = MfgBatchState::new(&transaction_context);
 
         let transaction_handler = MfgBatchTransactionHandler::new();
-        let product_delete_action = make_product_delete_action(PRODUCT_ID);
+        let mfg_batch_delete_action = make_mfg_batch_delete_action(PRODUCT_ID);
 
-        match transaction_handler.delete_product(
-            &product_delete_action,
+        match transaction_handler.delete_mfg_batch(
+            &mfg_batch_delete_action,
             &mut state,
             PUBLIC_KEY,
             &perm_checker,
         ) {
             Ok(()) => panic!(
-                "Agent should not have can_delete_product role, InvalidTransaction should be returned"
+                "Agent should not have can_delete_mfg_batch role, InvalidTransaction should be returned"
             ),
             Err(ApplyError::InvalidTransaction(err)) => {
                 assert_eq!(
-                    "The signer \"test_public_key\" does not have the \"product::can-delete-product\" permission for org \"test_org\"",
+                    "The signer \"test_public_key\" does not have the \"mfg_batch::can-delete-mfg_batch\" permission for org \"test_org\"",
                     err
                 );
             }
@@ -957,76 +959,76 @@ mod tests {
     }
 
     #[test]
-    /// Test that MfgBatchDeleteAction is invalid when deleting a non existant product
-    fn test_delete_product_not_exists() {
+    /// Test that MfgBatchDeleteAction is invalid when deleting a non existant mfg_batch
+    fn test_delete_mfg_batch_not_exists() {
         let transaction_context = MockTransactionContext::default();
         transaction_context.add_agent(PUBLIC_KEY);
         transaction_context.add_org(AGENT_ORG_ID);
-        transaction_context.add_products(&vec![PRODUCT_ID, PRODUCT_2_ID]);
+        transaction_context.add_mfg_batchs(&vec![PRODUCT_ID, PRODUCT_2_ID]);
         let perm_checker = PermissionChecker::new(&transaction_context);
         let mut state = MfgBatchState::new(&transaction_context);
 
         let transaction_handler = MfgBatchTransactionHandler::new();
-        let product_delete_action = make_product_delete_action("13491387613");
+        let mfg_batch_delete_action = make_mfg_batch_delete_action("13491387613");
 
-        match transaction_handler.delete_product(
-            &product_delete_action,
+        match transaction_handler.delete_mfg_batch(
+            &mfg_batch_delete_action,
             &mut state,
             PUBLIC_KEY,
             &perm_checker,
         ) {
             Ok(()) => panic!("Product should not exist, InvalidTransaction should be returned"),
             Err(ApplyError::InvalidTransaction(err)) => {
-                assert!(err.contains("No product exists: 13491387613"));
+                assert!(err.contains("No mfg_batch exists: 13491387613"));
             }
             Err(err) => panic!("Should have gotten invalid error but go {}", err),
         }
     }
 
-    fn make_product() -> Product {
+    fn make_mfg_batch() -> Product {
         MfgBatchBuilder::new()
-            .with_product_id(PRODUCT_ID.to_string())
+            .with_mfg_batch_id(PRODUCT_ID.to_string())
             .with_owner(AGENT_ORG_ID.to_string())
-            .with_product_namespace(MfgBatchNamespace::Gs1)
+            .with_mfg_batch_namespace(MfgBatchNamespace::Gs1)
             .with_properties(make_properties())
             .build()
-            .expect("Failed to build new_product")
+            .expect("Failed to build new_mfg_batch")
     }
 
-    fn make_products(product_ids: &[&str]) -> Vec<Product> {
+    fn make_mfg_batchs(mfg_batch_ids: &[&str]) -> Vec<Product> {
         vec![
             MfgBatchBuilder::new()
-                .with_product_id(product_ids[0].to_string())
+                .with_mfg_batch_id(mfg_batch_ids[0].to_string())
                 .with_owner(AGENT_ORG_ID.to_string())
-                .with_product_namespace(MfgBatchNamespace::Gs1)
+                .with_mfg_batch_namespace(MfgBatchNamespace::Gs1)
                 .with_properties(make_properties())
                 .build()
-                .expect("Failed to build new_product"),
+                .expect("Failed to build new_mfg_batch"),
             MfgBatchBuilder::new()
-                .with_product_id(product_ids[1].to_string())
+                .with_mfg_batch_id(mfg_batch_ids[1].to_string())
                 .with_owner(AGENT_ORG_ID.to_string())
-                .with_product_namespace(MfgBatchNamespace::Gs1)
+                .with_mfg_batch_namespace(MfgBatchNamespace::Gs1)
                 .with_properties(make_properties())
                 .build()
-                .expect("Failed to build new_product"),
+                .expect("Failed to build new_mfg_batch"),
         ]
     }
 
-    fn make_updated_product() -> Product {
+    fn make_updated_mfg_batch() -> Product {
         MfgBatchBuilder::new()
-            .with_product_id(PRODUCT_ID.to_string())
+            .with_mfg_batch_id(PRODUCT_ID.to_string())
             .with_owner(AGENT_ORG_ID.to_string())
-            .with_product_namespace(MfgBatchNamespace::Gs1)
+            .with_mfg_batch_namespace(MfgBatchNamespace::Gs1)
             .with_properties(make_updated_properties())
             .build()
-            .expect("Failed to build new_product")
+            .expect("Failed to build new_mfg_batch")
     }
 
     fn make_properties() -> Vec<PropertyValue> {
         let property_value_description = PropertyValueBuilder::new()
             .with_name("description".into())
             .with_data_type(DataType::String)
-            .with_string_value("This is a product description".into())
+            .with_string_value("This is a mfg_batch description".into())
             .build()
             .unwrap();
         let property_value_counter = PropertyValueBuilder::new()
@@ -1046,7 +1048,7 @@ mod tests {
         let property_value_description = PropertyValueBuilder::new()
             .with_name("description".into())
             .with_data_type(DataType::String)
-            .with_string_value("This is a new product description".into())
+            .with_string_value("This is a new mfg_batch description".into())
             .build()
             .unwrap();
         let property_value_counter = PropertyValueBuilder::new()
@@ -1062,29 +1064,29 @@ mod tests {
         ]
     }
 
-    fn make_product_create_action() -> MfgBatchCreateAction {
+    fn make_mfg_batch_create_action() -> MfgBatchCreateAction {
         MfgBatchCreateActionBuilder::new()
-            .with_product_id(PRODUCT_ID.to_string())
+            .with_mfg_batch_id(PRODUCT_ID.to_string())
             .with_owner(AGENT_ORG_ID.to_string())
-            .with_product_namespace(MfgBatchNamespace::Gs1)
+            .with_mfg_batch_namespace(MfgBatchNamespace::Gs1)
             .with_properties(make_properties())
             .build()
             .expect("Failed to build MfgBatchCreateAction")
     }
 
-    fn make_product_update_action() -> MfgBatchUpdateAction {
+    fn make_mfg_batch_update_action() -> MfgBatchUpdateAction {
         MfgBatchUpdateActionBuilder::new()
-            .with_product_id(PRODUCT_ID.to_string())
-            .with_product_namespace(MfgBatchNamespace::Gs1)
+            .with_mfg_batch_id(PRODUCT_ID.to_string())
+            .with_mfg_batch_namespace(MfgBatchNamespace::Gs1)
             .with_properties(make_updated_properties())
             .build()
             .expect("Failed to build MfgBatchUpdateAction")
     }
 
-    fn make_product_delete_action(product_id: &str) -> MfgBatchDeleteAction {
+    fn make_mfg_batch_delete_action(mfg_batch_id: &str) -> MfgBatchDeleteAction {
         MfgBatchDeleteActionBuilder::new()
-            .with_product_id(product_id.to_string())
-            .with_product_namespace(MfgBatchNamespace::Gs1)
+            .with_mfg_batch_id(mfg_batch_id.to_string())
+            .with_mfg_batch_namespace(MfgBatchNamespace::Gs1)
             .build()
             .expect("Failed to build MfgBatchDeleteAction")
     }

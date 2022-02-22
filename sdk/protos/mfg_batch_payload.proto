@@ -20,9 +20,9 @@ import "schema_state.proto";
 message MfgBatchPayload {
     enum Action {
         UNSET_ACTION = 0;
-        MFGBATCH_CREATE = 1;
-        MFGBATCH_UPDATE = 2;
-        MFGBATCH_DELETE = 3;
+        MFG_BATCH_CREATE = 1;
+        MFG_BATCH_UPDATE = 2;
+        MFG_BATCH_DELETE = 3;
     }
 
     Action action = 1;

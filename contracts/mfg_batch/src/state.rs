@@ -28,7 +28,7 @@ use grid_sdk::{
     mfg_batch::addressing::compute_gs1_mfg_batch_address,
     protocol::{
         pike::state::{Organization, OrganizationList},
-        mfg_batch::state::{MfgBatch, MfgBatch, MfgBatchBuilder},
+        mfg_batch::state::{MfgBatch, MfgBatchList, MfgBatchBuilder},
         schema::state::{Schema, SchemaList},
     },
     protos::{FromBytes, IntoBytes},
