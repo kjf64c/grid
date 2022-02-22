@@ -99,6 +99,7 @@ sqlite = [
 location = ["pike", "schema", "grid-sdk/location"]
 pike = ["grid-sdk/pike"]
 product = ["pike", "schema", "grid-sdk/product", "grid-sdk/product-gdsn"]
+# mfg_batch = ["pike", "schema", "grid-sdk/mfg_batch"]
 purchase-order = ["chrono", "grid-sdk/purchase-order", "rand", "serde_json"]
 schema = ["pike", "grid-sdk/schema"]
 xsd-downloader = ["zip", "reqwest", "sha2", "grid-sdk/data-validation"]

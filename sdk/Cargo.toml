@@ -14,7 +14,7 @@
 
 [package]
 name = "grid-sdk"
-version = "0.4.1"
+version = "0.4.2"
 authors = ["Cargill Incorporated"]
 description = """\
     Hyperledger Grid is a platform for building supply chain solutions \
@@ -123,7 +123,8 @@ experimental = [
     "rest-api-endpoint-submit",
     "rest-api-resources-submit",
     "rest-api-resources-track-and-trace",
-    "track-and-trace"
+    "track-and-trace",
+    "mfg_batch",
 ]
 
 backend = ["base64", "futures", "url"]
@@ -137,6 +138,7 @@ pike = ["cfg-if", "workflow"]
 product-gdsn = [ "libc", "quick-xml", "reqwest" ]
 purchase-order = ["pike", "regex"]
 product = ["pike", "schema"]
+mfg_batch = ["pike", "schema"]
 schema = ["pike"]
 track-and-trace = ["base64"]
 batch-processor = ["batch-store", "backend", "log", "reqwest", "uuid"]

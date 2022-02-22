@@ -1,0 +1,286 @@
+FIX_ME
+
+error[E0433]: failed to resolve: could not find `mfg_batch` in `grid_sdk`
+  --> contracts/mfg_batch/src/handler.rs:33:5
+   |
+33 |     mfg_batch::addressing::GRID_NAMESPACE,
+   |     ^^^^^^^^^ could not find `mfg_batch` in `grid_sdk`
+
+error[E0433]: failed to resolve: could not find `mfg_batch` in `protocol`
+  --> contracts/mfg_batch/src/handler.rs:34:15
+   |
+34 |     protocol::mfg_batch::{
+   |               ^^^^^^^^^ could not find `mfg_batch` in `protocol`
+
+error[E0433]: failed to resolve: could not find `mfg_batch` in `protocol`
+  --> contracts/mfg_batch/src/payload.rs:24:25
+   |
+24 | use grid_sdk::protocol::mfg_batch::payload::{Action, MfgBatchCreateAction, MfgBatchPayload};
+   |                         ^^^^^^^^^ could not find `mfg_batch` in `protocol`
+
+error[E0433]: failed to resolve: could not find `mfg_batch` in `grid_sdk`
+  --> contracts/mfg_batch/src/state.rs:28:5
+   |
+28 |     mfg_batch::addressing::compute_gs1_mfg_batch_address,
+   |     ^^^^^^^^^ could not find `mfg_batch` in `grid_sdk`
+
+error[E0433]: failed to resolve: could not find `mfg_batch` in `protocol`
+  --> contracts/mfg_batch/src/state.rs:31:9
+   |
+31 |         mfg_batch::state::{MfgBatch, MfgBatch, MfgBatchBuilder},
+   |         ^^^^^^^^^ could not find `mfg_batch` in `protocol`
+
+error[E0433]: failed to resolve: use of undeclared type `MfgBatchNamespace`
+   --> contracts/mfg_batch/src/handler.rs:115:36
+    |
+115 |         if mfg_batch_namespace != &MfgBatchNamespace::Gs1 {
+    |                                    ^^^^^^^^^^^^^^^^^ use of undeclared type `MfgBatchNamespace`
+
+error[E0433]: failed to resolve: use of undeclared type `MfgBatchNamespace`
+   --> contracts/mfg_batch/src/handler.rs:139:46
+    |
+139 |         if payload.mfg_batch_namespace() == &MfgBatchNamespace::Gs1 {
+    |                                              ^^^^^^^^^^^^^^^^^ use of undeclared type `MfgBatchNamespace`
+
+error[E0433]: failed to resolve: use of undeclared type `MfgBatchNamespace`
+   --> contracts/mfg_batch/src/handler.rs:162:46
+    |
+162 |         if payload.mfg_batch_namespace() == &MfgBatchNamespace::Gs1 {
+    |                                              ^^^^^^^^^^^^^^^^^ use of undeclared type `MfgBatchNamespace`
+
+error[E0433]: failed to resolve: use of undeclared type `MfgBatchBuilder`
+   --> contracts/mfg_batch/src/handler.rs:202:27
+    |
+202 |         let new_product = MfgBatchBuilder::new()
+    |                           ^^^^^^^^^^^^^^^ use of undeclared type `MfgBatchBuilder`
+
+error[E0433]: failed to resolve: use of undeclared type `MfgBatchNamespace`
+   --> contracts/mfg_batch/src/handler.rs:229:36
+    |
+229 |         if mfg_batch_namespace != &MfgBatchNamespace::Gs1 {
+    |                                    ^^^^^^^^^^^^^^^^^ use of undeclared type `MfgBatchNamespace`
+
+error[E0433]: failed to resolve: use of undeclared type `MfgBatchNamespace`
+   --> contracts/mfg_batch/src/handler.rs:258:44
+    |
+258 |         if payload.product_namespace() == &MfgBatchNamespace::Gs1 {
+    |                                            ^^^^^^^^^^^^^^^^^ use of undeclared type `MfgBatchNamespace`
+
+error[E0433]: failed to resolve: use of undeclared type `MfgBatchBuilder`
+   --> contracts/mfg_batch/src/handler.rs:299:31
+    |
+299 |         let updated_product = MfgBatchBuilder::new()
+    |                               ^^^^^^^^^^^^^^^ use of undeclared type `MfgBatchBuilder`
+
+error[E0433]: failed to resolve: use of undeclared type `MfgBatchNamespace`
+   --> contracts/mfg_batch/src/handler.rs:325:34
+    |
+325 |         if product_namespace != &MfgBatchNamespace::Gs1 {
+    |                                  ^^^^^^^^^^^^^^^^^ use of undeclared type `MfgBatchNamespace`
+
+error[E0433]: failed to resolve: use of undeclared type `MfgBatchPayload`
+   --> contracts/mfg_batch/src/handler.rs:378:23
+    |
+378 |         let payload = MfgBatchPayload::from_bytes(request.get_payload()).map_err(|err| {
+    |                       ^^^^^^^^^^^^^^^ use of undeclared type `MfgBatchPayload`
+
+error[E0433]: failed to resolve: use of undeclared type `Action`
+   --> contracts/mfg_batch/src/handler.rs:395:13
+    |
+395 |             Action::MfgBatchCreate(create_mfg_batch_payload) => {
+    |             ^^^^^^ use of undeclared type `Action`
+
+error[E0433]: failed to resolve: use of undeclared type `Action`
+   --> contracts/mfg_batch/src/handler.rs:398:13
+    |
+398 |             Action::MfgBatchUpdate(update_product_payload) => {
+    |             ^^^^^^ use of undeclared type `Action`
+
+error[E0433]: failed to resolve: use of undeclared type `Action`
+   --> contracts/mfg_batch/src/handler.rs:401:13
+    |
+401 |             Action::MfgBatchDelete(delete_product_payload) => {
+    |             ^^^^^^ use of undeclared type `Action`
+
+error[E0433]: failed to resolve: use of undeclared type `Action`
+  --> contracts/mfg_batch/src/payload.rs:29:9
+   |
+29 |         Action::MfgBatchCreate(action_payload) => validate_mfg_batch_create_action(action_payload),
+   |         ^^^^^^ use of undeclared type `Action`
+
+error[E0433]: failed to resolve: use of undeclared type `MfgBatch`
+  --> contracts/mfg_batch/src/state.rs:53:41
+   |
+53 |                 let mfg_batches = match MfgBatch::from_bytes(packed.as_slice()) {
+   |                                         ^^^^^^^^ use of undeclared type `MfgBatch`
+
+error[E0433]: failed to resolve: use of undeclared type `MfgBatch`
+  --> contracts/mfg_batch/src/state.rs:78:35
+   |
+78 |             Some(packed) => match MfgBatch::from_bytes(packed.as_slice()) {
+   |                                   ^^^^^^^^ use of undeclared type `MfgBatch`
+
+error[E0433]: failed to resolve: use of undeclared type `MfgBatchBuilder`
+   --> contracts/mfg_batch/src/state.rs:103:30
+    |
+103 |         let mfg_batch_list = MfgBatchBuilder::new()
+    |                              ^^^^^^^^^^^^^^^ use of undeclared type `MfgBatchBuilder`
+
+error[E0433]: failed to resolve: use of undeclared type `MfgBatch`
+   --> contracts/mfg_batch/src/state.rs:131:35
+    |
+131 |             Some(packed) => match MfgBatch::from_bytes(packed.as_slice()) {
+    |                                   ^^^^^^^^ use of undeclared type `MfgBatch`
+
+error[E0433]: failed to resolve: use of undeclared type `MfgBatchBuilder`
+   --> contracts/mfg_batch/src/state.rs:156:34
+    |
+156 |             let mfg_batch_list = MfgBatchBuilder::new()
+    |                                  ^^^^^^^^^^^^^^^ use of undeclared type `MfgBatchBuilder`
+
+error[E0425]: cannot find value `GRID_NAMESPACE` in this scope
+  --> contracts/mfg_batch/src/handler.rs:82:30
+   |
+82 |             namespaces: vec![GRID_NAMESPACE.to_string()],
+   |                              ^^^^^^^^^^^^^^ not found in this scope
+   |
+help: consider importing this constant
+   |
+18 |         use grid_sdk::schema::addressing::GRID_NAMESPACE;
+   |
+
+error[E0412]: cannot find type `MfgBatchCreateAction` in this scope
+  --> contracts/mfg_batch/src/handler.rs:88:19
+   |
+88 |         payload: &MfgBatchCreateAction,
+   |                   ^^^^^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find value `mfg_batch_namespace` in this scope
+   --> contracts/mfg_batch/src/handler.rs:115:12
+    |
+115 |         if mfg_batch_namespace != &MfgBatchNamespace::Gs1 {
+    |            ^^^^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find value `mfg_batch_namespace` in this scope
+   --> contracts/mfg_batch/src/handler.rs:205:39
+    |
+205 |             .with_mfg_batch_namespace(mfg_batch_namespace.clone())
+    |                                       ^^^^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0412]: cannot find type `MfgBatchUpdateAction` in this scope
+   --> contracts/mfg_batch/src/handler.rs:219:19
+    |
+219 |         payload: &MfgBatchUpdateAction,
+    |                   ^^^^^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find value `product_namespace` in this scope
+   --> contracts/mfg_batch/src/handler.rs:302:37
+    |
+302 |             .with_product_namespace(product_namespace.clone())
+    |                                     ^^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0412]: cannot find type `MfgBatchDeleteAction` in this scope
+   --> contracts/mfg_batch/src/handler.rs:316:19
+    |
+316 |         payload: &MfgBatchDeleteAction,
+    |                   ^^^^^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0412]: cannot find type `MfgBatchPayload` in this scope
+  --> contracts/mfg_batch/src/payload.rs:26:35
+   |
+26 | pub fn validate_payload(payload: &MfgBatchPayload) -> Result<(), ApplyError> {
+   |                                   ^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0412]: cannot find type `MfgBatchCreateAction` in this scope
+  --> contracts/mfg_batch/src/payload.rs:35:31
+   |
+35 |     mfg_batch_create_action: &MfgBatchCreateAction,
+   |                               ^^^^^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0412]: cannot find type `MfgBatch` in this scope
+  --> contracts/mfg_batch/src/state.rs:47:70
+   |
+42 | impl<'a> MfgBatchState<'a> {
+   |        - help: you might be missing a type parameter: `, MfgBatch`
+...
+47 |     pub fn get_mfg_batch(&self, mfg_batch_id: &str) -> Result<Option<MfgBatch>, ApplyError> {
+   |                                                                      ^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `compute_gs1_mfg_batch_address` in this scope
+  --> contracts/mfg_batch/src/state.rs:49:23
+   |
+49 |         let address = compute_gs1_mfg_batch_address(mfg_batch_id); //mfg_batch id = gtin
+   |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0412]: cannot find type `MfgBatch` in this scope
+  --> contracts/mfg_batch/src/state.rs:73:64
+   |
+73 |     pub fn set_mfg_batch(&self, mfg_batch_id: &str, mfg_batch: MfgBatch) -> Result<(), ApplyError> {
+   |                                                                ^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `compute_gs1_mfg_batch_address` in this scope
+  --> contracts/mfg_batch/src/state.rs:75:23
+   |
+75 |         let address = compute_gs1_mfg_batch_address(mfg_batch_id);
+   |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `compute_gs1_mfg_batch_address` in this scope
+   --> contracts/mfg_batch/src/state.rs:128:23
+    |
+128 |         let address = compute_gs1_mfg_batch_address(mfg_batch_id);
+    |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
+
+warning: unused import: `protos::FromBytes`
+  --> contracts/mfg_batch/src/handler.rs:40:5
+   |
+40 |     protos::FromBytes,
+   |     ^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` on by default
+
+error[E0599]: no method named `get_product` found for mutable reference `&mut MfgBatchState<'_>` in the current scope
+   --> contracts/mfg_batch/src/handler.rs:236:35
+    |
+236 |         let product = match state.get_product(mfg_batch_id) {
+    |                                   ^^^^^^^^^^^ method not found in `&mut MfgBatchState<'_>`
+
+error[E0599]: no method named `set_product` found for mutable reference `&mut MfgBatchState<'_>` in the current scope
+   --> contracts/mfg_batch/src/handler.rs:309:15
+    |
+309 |         state.set_product(mfg_batch_id, updated_product)?;
+    |               ^^^^^^^^^^^ method not found in `&mut MfgBatchState<'_>`
+
+error[E0308]: mismatched types
+   --> contracts/mfg_batch/src/state.rs:120:30
+    |
+120 |             .set_state_entry(address, serialized)
+    |                              ^^^^^^^- help: try using a conversion method: `.to_string()`
+    |                              |
+    |                              expected struct `std::string::String`, found `str`
+
+error[E0308]: mismatched types
+   --> contracts/mfg_batch/src/state.rs:153:41
+    |
+153 |                 .delete_state_entries(&[address])
+    |                                         ^^^^^^^- help: try using a conversion method: `.to_string()`
+    |                                         |
+    |                                         expected struct `std::string::String`, found `str`
+
+error[E0308]: mismatched types
+   --> contracts/mfg_batch/src/state.rs:172:34
+    |
+172 |                 .set_state_entry(address, serialized)
+    |                                  ^^^^^^^- help: try using a conversion method: `.to_string()`
+    |                                  |
+    |                                  expected struct `std::string::String`, found `str`
+
+warning: unused import: `IntoBytes`
+  --> contracts/mfg_batch/src/state.rs:34:25
+   |
+34 |     protos::{FromBytes, IntoBytes},
+   |                         ^^^^^^^^^
+
+Some errors have detailed explanations: E0308, E0412, E0425, E0433, E0599.
+For more information about an error, try `rustc --explain E0308`.
+warning: `grid-mfg-batch-tp` (bin "grid-mfg-batch-tp") generated 2 warnings
+error: could not compile `grid-mfg-batch-tp` due to 42 previous errors; 2 warnings emitted

@@ -14,7 +14,7 @@
 
 [package]
 name = "grid-mfg-batch-tp"
-version = "0.4.1"
+version = "0.1.1"
 authors = ["A Company"]
 description = "Grid Manufactured Batch Smart Contract"
 homepage = "https://grid.hyperledger.org"
@@ -22,7 +22,7 @@ edition = "2018"
 
 [dependencies]
 clap = "2"
-grid-sdk = { path = "../../sdk", features = ["pike", "schema"] }
+grid-sdk = { path = "../../sdk", features = ["pike", "mfg_batch", "schema"] }
 cfg-if = "1"
 hex = "0.4"
 protobuf = "2.19"
@@ -31,6 +31,7 @@ protobuf = "2.19"
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 rust-crypto-wasm = "0.3"
 sabre-sdk = "0.5"
+
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 rust-crypto = "0.2.36"
