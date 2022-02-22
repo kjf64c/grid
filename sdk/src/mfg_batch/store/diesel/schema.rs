@@ -13,10 +13,10 @@
 // limitations under the License.
 
 table! {
-    product_property_value (id) {
+    mfg_batch_property_value (id) {
         id -> Int8,
-        product_id -> Varchar,
-        product_address -> Varchar,
+        mfg_batch_id -> Varchar,
+        mfg_batch_address -> Varchar,
         property_name -> Text,
         parent_property -> Nullable<Text>,
         data_type -> Text,
@@ -34,11 +34,11 @@ table! {
 }
 
 table! {
-    product (id) {
+    mfg_batch (id) {
         id -> Int8,
-        product_id -> Varchar,
-        product_address -> Varchar,
-        product_namespace -> Text,
+        mfg_batch_id -> Varchar,
+        mfg_batch_address -> Varchar,
+        mfg_batch_namespace -> Text,
         owner -> Varchar,
         start_commit_num -> Int8,
         end_commit_num -> Int8,

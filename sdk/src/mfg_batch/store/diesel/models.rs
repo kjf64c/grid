@@ -14,19 +14,19 @@
 
 use chrono::NaiveDateTime;
 
-use crate::product::{
-    store::{LatLongValue, Product as GridProduct, PropertyValue},
+use crate::mfg_batch::{
+    store::{LatLongValue, MfgBatch as GridMfgBatch, PropertyValue},
     MAX_COMMIT_NUM,
 };
 
-use super::schema::{product, product_property_value};
+use super::schema::{mfg_batch, mfg_batch_property_value};
 
 #[derive(Clone, Insertable, Debug)]
-#[table_name = "product"]
-pub struct NewProduct {
-    pub product_id: String,
-    pub product_address: String,
-    pub product_namespace: String,
+#[table_name = "mfg_batch"]
+pub struct NewMfgBatch {
+    pub mfg_batch_id: String,
+    pub mfg_batch_address: String,
+    pub mfg_batch_namespace: String,
     pub owner: String,
     pub start_commit_num: i64,
     pub end_commit_num: i64,
@@ -34,12 +34,12 @@ pub struct NewProduct {
 }
 
 #[derive(Queryable, Identifiable, Debug)]
-#[table_name = "product"]
-pub struct Product {
+#[table_name = "mfg_batch"]
+pub struct MfgBatch {
     pub id: i64,
-    pub product_id: String,
-    pub product_address: String,
-    pub product_namespace: String,
+    pub mfg_batch_id: String,
+    pub mfg_batch_address: String,
+    pub mfg_batch_namespace: String,
     pub owner: String,
     pub start_commit_num: i64,
     pub end_commit_num: i64,
@@ -48,10 +48,10 @@ pub struct Product {
 }
 
 #[derive(AsChangeset, Clone, Insertable, Debug)]
-#[table_name = "product_property_value"]
-pub struct NewProductPropertyValue {
-    pub product_id: String,
-    pub product_address: String,
+#[table_name = "mfg_batch_property_value"]
+pub struct NewMfgBatchPropertyValue {
+    pub mfg_batch_id: String,
+    pub mfg_batch_address: String,
     pub property_name: String,
     pub parent_property: Option<String>,
     pub data_type: String,
@@ -68,11 +68,11 @@ pub struct NewProductPropertyValue {
 }
 
 #[derive(Queryable, Identifiable, Debug)]
-#[table_name = "product_property_value"]
-pub struct ProductPropertyValue {
+#[table_name = "mfg_batch_property_value"]
+pub struct MfgBatchPropertyValue {
     pub id: i64,
-    pub product_id: String,
-    pub product_address: String,
+    pub mfg_batch_id: String,
+    pub mfg_batch_address: String,
     pub property_name: String,
     pub parent_property: Option<String>,
     pub data_type: String,
@@ -88,28 +88,28 @@ pub struct ProductPropertyValue {
     pub service_id: Option<String>,
 }
 
-impl From<GridProduct> for (NewProduct, Vec<NewProductPropertyValue>) {
-    fn from(product: GridProduct) -> Self {
-        let new_product = NewProduct {
-            product_id: product.product_id.clone(),
-            product_address: product.product_address.clone(),
-            product_namespace: product.product_namespace.clone(),
-            owner: product.owner.clone(),
-            start_commit_num: product.start_commit_num,
-            end_commit_num: product.end_commit_num,
-            service_id: product.service_id.clone(),
+impl From<GridMfgBatch> for (NewMfgBatch, Vec<NewMfgBatchPropertyValue>) {
+    fn from(mfg_batch: GridMfgBatch) -> Self {
+        let new_mfg_batch = NewMfgBatch {
+            mfg_batch_id: mfg_batch.mfg_batch_id.clone(),
+            mfg_batch_address: mfg_batch.mfg_batch_address.clone(),
+            mfg_batch_namespace: mfg_batch.mfg_batch_namespace.clone(),
+            owner: mfg_batch.owner.clone(),
+            start_commit_num: mfg_batch.start_commit_num,
+            end_commit_num: mfg_batch.end_commit_num,
+            service_id: mfg_batch.service_id.clone(),
         };
 
-        (new_product, make_property_values(None, &product.properties))
+        (new_mfg_batch, make_property_values(None, &mfg_batch.properties))
     }
 }
 
-impl From<(Product, Vec<PropertyValue>)> for GridProduct {
-    fn from((model, properties): (Product, Vec<PropertyValue>)) -> Self {
+impl From<(MfgBatch, Vec<PropertyValue>)> for GridMfgBatch {
+    fn from((model, properties): (MfgBatch, Vec<PropertyValue>)) -> Self {
         Self {
-            product_id: model.product_id,
-            product_address: model.product_address,
-            product_namespace: model.product_namespace,
+            mfg_batch_id: model.mfg_batch_id,
+            mfg_batch_address: model.mfg_batch_address,
+            mfg_batch_namespace: model.mfg_batch_namespace,
             owner: model.owner,
             start_commit_num: model.start_commit_num,
             end_commit_num: model.end_commit_num,
@@ -123,13 +123,13 @@ impl From<(Product, Vec<PropertyValue>)> for GridProduct {
 fn make_property_values(
     parent_property: Option<String>,
     properties: &[PropertyValue],
-) -> Vec<NewProductPropertyValue> {
-    let mut model_properties: Vec<NewProductPropertyValue> = Vec::new();
+) -> Vec<NewMfgBatchPropertyValue> {
+    let mut model_properties: Vec<NewMfgBatchPropertyValue> = Vec::new();
 
     for property in properties {
-        model_properties.push(NewProductPropertyValue {
-            product_id: property.product_id.clone(),
-            product_address: property.product_address.clone(),
+        model_properties.push(NewMfgBatchPropertyValue {
+            mfg_batch_id: property.mfg_batch_id.clone(),
+            mfg_batch_address: property.mfg_batch_address.clone(),
             property_name: property.property_name.clone(),
             parent_property: parent_property.clone(),
             data_type: property.data_type.clone(),
@@ -149,7 +149,7 @@ fn make_property_values(
             model_properties.append(&mut make_property_values(
                 Some(format!(
                     "{}:{}",
-                    property.product_id, property.property_name
+                    property.mfg_batch_id, property.property_name
                 )),
                 &property.struct_values,
             ));
@@ -159,11 +159,11 @@ fn make_property_values(
     model_properties
 }
 
-impl From<ProductPropertyValue> for PropertyValue {
-    fn from(model: ProductPropertyValue) -> Self {
+impl From<MfgBatchPropertyValue> for PropertyValue {
+    fn from(model: MfgBatchPropertyValue) -> Self {
         Self {
-            product_id: model.product_id,
-            product_address: model.product_address,
+            mfg_batch_id: model.mfg_batch_id,
+            mfg_batch_address: model.mfg_batch_address,
             property_name: model.property_name,
             data_type: model.data_type,
             bytes_value: model.bytes_value,
@@ -187,11 +187,11 @@ impl From<ProductPropertyValue> for PropertyValue {
     }
 }
 
-impl From<(ProductPropertyValue, Vec<PropertyValue>)> for PropertyValue {
-    fn from((model, children): (ProductPropertyValue, Vec<PropertyValue>)) -> Self {
+impl From<(MfgBatchPropertyValue, Vec<PropertyValue>)> for PropertyValue {
+    fn from((model, children): (MfgBatchPropertyValue, Vec<PropertyValue>)) -> Self {
         Self {
-            product_id: model.product_id,
-            product_address: model.product_address,
+            mfg_batch_id: model.mfg_batch_id,
+            mfg_batch_address: model.mfg_batch_address,
             property_name: model.property_name,
             data_type: model.data_type,
             bytes_value: model.bytes_value,

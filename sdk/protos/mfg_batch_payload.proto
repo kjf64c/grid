@@ -38,7 +38,7 @@ message MfgBatchPayload {
 
 message MfgBatchCreateAction {
     // mfg_batch_namespace and mfg_batch_id are used in deriving the state address
-    Product.MfgBatchNamespace mfg_batch_namespace = 1;
+    MfgBatch.MfgBatchNamespace mfg_batch_namespace = 1;
     string mfg_batch_id = 2;
     string owner = 3;
     repeated PropertyValue properties = 4;
@@ -46,7 +46,7 @@ message MfgBatchCreateAction {
 
 message MfgBatchUpdateAction {
     // mfg_batch_namespace and mfg_batch_id are used in deriving the state address
-    Product.MfgBatchNamespace mfg_batch_namespace = 1;
+    MfgBatch.MfgBatchNamespace mfg_batch_namespace = 1;
     string mfg_batch_id = 2;
     // this will replace all properties currently defined
     repeated PropertyValue properties = 3;
@@ -54,6 +54,6 @@ message MfgBatchUpdateAction {
 
 message MfgBatchDeleteAction {
     // mfg_batch_namespace and mfg_batch_id are used in deriving the state address
-    Product.MfgBatchNamespace mfg_batch_namespace = 1;
+    MfgBatch.MfgBatchNamespace mfg_batch_namespace = 1;
     string mfg_batch_id = 2;
  }

@@ -12,21 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub(super) mod add_product;
-pub(super) mod delete_product;
-pub(super) mod get_product;
-pub(super) mod list_products;
-pub(super) mod update_product;
+pub(super) mod add_mfg_batch;
+pub(super) mod delete_mfg_batch;
+pub(super) mod get_mfg_batch;
+pub(super) mod list_mfg_batch;
+pub(super) mod update_mfg_batch;
 
-pub(super) struct ProductStoreOperations<'a, C> {
+pub(super) struct MfgBatchStoreOperations<'a, C> {
     conn: &'a C,
 }
 
-impl<'a, C> ProductStoreOperations<'a, C>
+impl<'a, C> MfgBatchStoreOperations<'a, C>
 where
     C: diesel::Connection,
 {
     pub fn new(conn: &'a C) -> Self {
-        ProductStoreOperations { conn }
+        MfgBatchStoreOperations { conn }
     }
 }

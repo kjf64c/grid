@@ -12,35 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::ProductStoreOperations;
+use super::MfgBatchStoreOperations;
 
-use crate::product::{
-    store::{diesel::schema::product_property_value, error::ProductStoreError},
+use crate::mfg_batch::{
+    store::{diesel::schema::mfg_batch_property_value, error::MfgBatchStoreError},
     MAX_COMMIT_NUM,
 };
 use diesel::{dsl::update, prelude::*};
 
-pub(in crate::product) trait UpdateProductOperation {
-    fn update_product(
+pub(in crate::mfg_batch) trait UpdateMfgBatchOperation {
+    fn update_mfg_batch(
         &self,
-        product_id: &str,
+        mfg_batch_id: &str,
         service_id: Option<&str>,
         current_commit_num: i64,
-    ) -> Result<(), ProductStoreError>;
+    ) -> Result<(), MfgBatchStoreError>;
 }
 
 #[cfg(feature = "postgres")]
-impl<'a> UpdateProductOperation for ProductStoreOperations<'a, diesel::pg::PgConnection> {
-    fn update_product(
+impl<'a> UpdateMfgBatchOperation for MfgBatchStoreOperations<'a, diesel::pg::PgConnection> {
+    fn update_mfg_batch(
         &self,
-        product_id: &str,
+        mfg_batch_id: &str,
         service_id: Option<&str>,
         current_commit_num: i64,
-    ) -> Result<(), ProductStoreError> {
-        self.conn.transaction::<_, ProductStoreError, _>(|| {
-            pg::update_product_property_values(
+    ) -> Result<(), MfgBatchStoreError> {
+        self.conn.transaction::<_, MfgBatchStoreError, _>(|| {
+            pg::update_mfg_batch_property_values(
                 &*self.conn,
-                product_id,
+                mfg_batch_id,
                 service_id,
                 current_commit_num,
             )?;
@@ -51,17 +51,17 @@ impl<'a> UpdateProductOperation for ProductStoreOperations<'a, diesel::pg::PgCon
 }
 
 #[cfg(feature = "sqlite")]
-impl<'a> UpdateProductOperation for ProductStoreOperations<'a, diesel::sqlite::SqliteConnection> {
-    fn update_product(
+impl<'a> UpdateMfgBatchOperation for MfgBatchStoreOperations<'a, diesel::sqlite::SqliteConnection> {
+    fn update_mfg_batch(
         &self,
-        product_id: &str,
+        mfg_batch_id: &str,
         service_id: Option<&str>,
         current_commit_num: i64,
-    ) -> Result<(), ProductStoreError> {
-        self.conn.transaction::<_, ProductStoreError, _>(|| {
-            sqlite::update_product_property_values(
+    ) -> Result<(), MfgBatchStoreError> {
+        self.conn.transaction::<_, MfgBatchStoreError, _>(|| {
+            sqlite::update_mfg_batch_property_values(
                 &*self.conn,
-                product_id,
+                mfg_batch_id,
                 service_id,
                 current_commit_num,
             )?;
@@ -75,33 +75,33 @@ impl<'a> UpdateProductOperation for ProductStoreOperations<'a, diesel::sqlite::S
 mod pg {
     use super::*;
 
-    pub fn update_product_property_values(
+    pub fn update_mfg_batch_property_values(
         conn: &PgConnection,
-        product_id: &str,
+        mfg_batch_id: &str,
         service_id: Option<&str>,
         current_commit_num: i64,
     ) -> QueryResult<()> {
-        let update = update(product_property_value::table);
+        let update = update(mfg_batch_property_value::table);
 
         if let Some(service_id) = service_id {
             update
                 .filter(
-                    product_property_value::product_id
-                        .eq(product_id)
-                        .and(product_property_value::end_commit_num.eq(MAX_COMMIT_NUM))
-                        .and(product_property_value::service_id.eq(service_id)),
+                    mfg_batch_property_value::mfg_batch_id
+                        .eq(mfg_batch_id)
+                        .and(mfg_batch_property_value::end_commit_num.eq(MAX_COMMIT_NUM))
+                        .and(mfg_batch_property_value::service_id.eq(service_id)),
                 )
-                .set(product_property_value::end_commit_num.eq(current_commit_num))
+                .set(mfg_batch_property_value::end_commit_num.eq(current_commit_num))
                 .execute(conn)
                 .map(|_| ())
         } else {
             update
                 .filter(
-                    product_property_value::product_id
-                        .eq(product_id)
-                        .and(product_property_value::end_commit_num.eq(MAX_COMMIT_NUM)),
+                    mfg_batch_property_value::mfg_batch_id
+                        .eq(mfg_batch_id)
+                        .and(mfg_batch_property_value::end_commit_num.eq(MAX_COMMIT_NUM)),
                 )
-                .set(product_property_value::end_commit_num.eq(current_commit_num))
+                .set(mfg_batch_property_value::end_commit_num.eq(current_commit_num))
                 .execute(conn)
                 .map(|_| ())
         }
@@ -112,33 +112,33 @@ mod pg {
 mod sqlite {
     use super::*;
 
-    pub fn update_product_property_values(
+    pub fn update_mfg_batch_property_values(
         conn: &SqliteConnection,
-        product_id: &str,
+        mfg_batch_id: &str,
         service_id: Option<&str>,
         current_commit_num: i64,
     ) -> QueryResult<()> {
-        let update = update(product_property_value::table);
+        let update = update(mfg_batch_property_value::table);
 
         if let Some(service_id) = service_id {
             update
                 .filter(
-                    product_property_value::product_id
-                        .eq(product_id)
-                        .and(product_property_value::end_commit_num.eq(MAX_COMMIT_NUM))
-                        .and(product_property_value::service_id.eq(service_id)),
+                    mfg_batch_property_value::mfg_batch_id
+                        .eq(mfg_batch_id)
+                        .and(mfg_batch_property_value::end_commit_num.eq(MAX_COMMIT_NUM))
+                        .and(mfg_batch_property_value::service_id.eq(service_id)),
                 )
-                .set(product_property_value::end_commit_num.eq(current_commit_num))
+                .set(mfg_batch_property_value::end_commit_num.eq(current_commit_num))
                 .execute(conn)
                 .map(|_| ())
         } else {
             update
                 .filter(
-                    product_property_value::product_id
-                        .eq(product_id)
-                        .and(product_property_value::end_commit_num.eq(MAX_COMMIT_NUM)),
+                    mfg_batch_property_value::mfg_batch_id
+                        .eq(mfg_batch_id)
+                        .and(mfg_batch_property_value::end_commit_num.eq(MAX_COMMIT_NUM)),
                 )
-                .set(product_property_value::end_commit_num.eq(current_commit_num))
+                .set(mfg_batch_property_value::end_commit_num.eq(current_commit_num))
                 .execute(conn)
                 .map(|_| ())
         }

@@ -19,14 +19,14 @@ pub mod error;
 use crate::paging::Paging;
 
 #[cfg(feature = "diesel")]
-pub use self::diesel::{DieselConnectionProductStore, DieselProductStore};
-pub use error::{ProductBuilderError, ProductStoreError};
+pub use self::diesel::{DieselConnectionMfgBatchStore, DieselMfgBatchStore};
+pub use error::{MfgBatchBuilderError, MfgBatchStoreError};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Product {
-    product_id: String,
-    product_address: String,
-    product_namespace: String,
+pub struct MfgBatch {
+    mfg_batch_id: String,
+    mfg_batch_address: String,
+    mfg_batch_namespace: String,
     owner: String,
     start_commit_num: i64,
     end_commit_num: i64,
@@ -35,59 +35,59 @@ pub struct Product {
     properties: Vec<PropertyValue>,
 }
 
-impl Product {
-    /// Returns the product_id for the product
-    pub fn product_id(&self) -> &str {
-        &self.product_id
+impl MfgBatch {
+    /// Returns the mfg_batch_id for the mfg_batch
+    pub fn mfg_batch_id(&self) -> &str {
+        &self.mfg_batch_id
     }
 
-    /// Returns the product_address for the product
-    pub fn product_address(&self) -> &str {
-        &self.product_address
+    /// Returns the mfg_batch_address for the mfg_batch
+    pub fn mfg_batch_address(&self) -> &str {
+        &self.mfg_batch_address
     }
 
-    /// Returns the product_namespace for the product
-    pub fn product_namespace(&self) -> &str {
-        &self.product_namespace
+    /// Returns the mfg_batch_namespace for the mfg_batch
+    pub fn mfg_batch_namespace(&self) -> &str {
+        &self.mfg_batch_namespace
     }
 
-    /// Returns the owner for the product
+    /// Returns the owner for the mfg_batch
     pub fn owner(&self) -> &str {
         &self.owner
     }
 
-    /// Returns the start_commit_num for the product
+    /// Returns the start_commit_num for the mfg_batch
     pub fn start_commit_num(&self) -> &i64 {
         &self.start_commit_num
     }
 
-    /// Returns the end_commit_num for the product
+    /// Returns the end_commit_num for the mfg_batch
     pub fn end_commit_num(&self) -> &i64 {
         &self.end_commit_num
     }
 
-    /// Returns the service_id for the product
+    /// Returns the service_id for the mfg_batch
     pub fn service_id(&self) -> Option<&str> {
         self.service_id.as_deref()
     }
 
-    /// Returns the last updated timestamp for the product
+    /// Returns the last updated timestamp for the mfg_batch
     pub fn last_updated(&self) -> Option<&i64> {
         self.last_updated.as_ref()
     }
 
-    /// Returns the properties for the product
+    /// Returns the properties for the mfg_batch
     pub fn properties(&self) -> Vec<PropertyValue> {
         self.properties.to_vec()
     }
 }
 
-/// Builder used to create a Product
+/// Builder used to create a MfgBatch
 #[derive(Default, Clone)]
-pub struct ProductBuilder {
-    product_id: String,
-    product_address: String,
-    product_namespace: String,
+pub struct MfgBatchBuilder {
+    mfg_batch_id: String,
+    mfg_batch_address: String,
+    mfg_batch_namespace: String,
     owner: String,
     start_commit_num: i64,
     end_commit_num: i64,
@@ -96,66 +96,66 @@ pub struct ProductBuilder {
     properties: Vec<PropertyValue>,
 }
 
-impl ProductBuilder {
-    /// Sets the product ID for this product
-    pub fn with_product_id(mut self, product_id: String) -> Self {
-        self.product_id = product_id;
+impl MfgBatchBuilder {
+    /// Sets the mfg_batch ID for this mfg_batch
+    pub fn with_mfg_batch_id(mut self, mfg_batch_id: String) -> Self {
+        self.mfg_batch_id = mfg_batch_id;
         self
     }
 
-    /// Sets the product address for this product
-    pub fn with_product_address(mut self, product_address: String) -> Self {
-        self.product_address = product_address;
+    /// Sets the mfg_batch address for this mfg_batch
+    pub fn with_mfg_batch_address(mut self, mfg_batch_address: String) -> Self {
+        self.mfg_batch_address = mfg_batch_address;
         self
     }
 
-    /// Sets the product namespace for this product
-    pub fn with_product_namespace(mut self, product_namespace: String) -> Self {
-        self.product_namespace = product_namespace;
+    /// Sets the mfg_batch namespace for this mfg_batch
+    pub fn with_mfg_batch_namespace(mut self, mfg_batch_namespace: String) -> Self {
+        self.mfg_batch_namespace = mfg_batch_namespace;
         self
     }
 
-    /// Sets the owner of the product
+    /// Sets the owner of the mfg_batch
     pub fn with_owner(mut self, owner: String) -> Self {
         self.owner = owner;
         self
     }
 
-    /// Sets the start commit number for this product
+    /// Sets the start commit number for this mfg_batch
     pub fn with_start_commit_number(mut self, start_commit_num: i64) -> Self {
         self.start_commit_num = start_commit_num;
         self
     }
 
-    /// Sets the end commit number for this product
+    /// Sets the end commit number for this mfg_batch
     pub fn with_end_commit_number(mut self, end_commit_num: i64) -> Self {
         self.end_commit_num = end_commit_num;
         self
     }
 
-    /// Sets the service ID for this product
+    /// Sets the service ID for this mfg_batch
     pub fn with_service_id(mut self, service_id: Option<String>) -> Self {
         self.service_id = service_id;
         self
     }
 
-    /// Sets the last updated timestamp for this product
+    /// Sets the last updated timestamp for this mfg_batch
     pub fn with_last_updated(mut self, last_updated: Option<i64>) -> Self {
         self.last_updated = last_updated;
         self
     }
 
-    /// Sets the properties for this product
+    /// Sets the properties for this mfg_batch
     pub fn with_properties(mut self, properties: Vec<PropertyValue>) -> Self {
         self.properties = properties;
         self
     }
 
-    pub fn build(self) -> Result<Product, ProductBuilderError> {
-        let ProductBuilder {
-            product_id,
-            product_address,
-            product_namespace,
+    pub fn build(self) -> Result<MfgBatch, MfgBatchBuilderError> {
+        let MfgBatchBuilder {
+            mfg_batch_id,
+            mfg_batch_address,
+            mfg_batch_namespace,
             owner,
             start_commit_num,
             end_commit_num,
@@ -164,46 +164,46 @@ impl ProductBuilder {
             properties,
         } = self;
 
-        if product_id.is_empty() {
-            return Err(ProductBuilderError::MissingRequiredField(
-                "Missing product_id".to_string(),
+        if mfg_batch_id.is_empty() {
+            return Err(MfgBatchBuilderError::MissingRequiredField(
+                "Missing mfg_batch_id".to_string(),
             ));
         };
 
-        if product_address.is_empty() {
-            return Err(ProductBuilderError::MissingRequiredField(
-                "Missing product_address".to_string(),
+        if mfg_batch_address.is_empty() {
+            return Err(MfgBatchBuilderError::MissingRequiredField(
+                "Missing mfg_batch_address".to_string(),
             ));
         };
 
-        if product_namespace.is_empty() {
-            return Err(ProductBuilderError::MissingRequiredField(
-                "Missing product_namespace".to_string(),
+        if mfg_batch_namespace.is_empty() {
+            return Err(MfgBatchBuilderError::MissingRequiredField(
+                "Missing mfg_batch_namespace".to_string(),
             ));
         };
 
         if owner.is_empty() {
-            return Err(ProductBuilderError::MissingRequiredField(
+            return Err(MfgBatchBuilderError::MissingRequiredField(
                 "Missing owner".to_string(),
             ));
         };
 
         if start_commit_num >= end_commit_num {
-            return Err(ProductBuilderError::MissingRequiredField(
+            return Err(MfgBatchBuilderError::MissingRequiredField(
                 "start_commit_number must be less than end_commit_num".to_string(),
             ));
         };
 
         if end_commit_num <= start_commit_num {
-            return Err(ProductBuilderError::MissingRequiredField(
+            return Err(MfgBatchBuilderError::MissingRequiredField(
                 "end_commit_number must be greater than start_commit_num".to_string(),
             ));
         };
 
-        Ok(Product {
-            product_id,
-            product_address,
-            product_namespace,
+        Ok(MfgBatch {
+            mfg_batch_id,
+            mfg_batch_address,
+            mfg_batch_namespace,
             owner,
             start_commit_num,
             end_commit_num,
@@ -216,8 +216,8 @@ impl ProductBuilder {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PropertyValue {
-    product_id: String,
-    product_address: String,
+    mfg_batch_id: String,
+    mfg_batch_address: String,
     property_name: String,
     data_type: String,
     bytes_value: Option<Vec<u8>>,
@@ -233,14 +233,14 @@ pub struct PropertyValue {
 }
 
 impl PropertyValue {
-    /// Returns the product_id for the property value
-    pub fn product_id(&self) -> &str {
-        &self.product_id
+    /// Returns the mfg_batch_id for the property value
+    pub fn mfg_batch_id(&self) -> &str {
+        &self.mfg_batch_id
     }
 
-    /// Returns the product_address for the property value
-    pub fn product_address(&self) -> &str {
-        &self.product_address
+    /// Returns the mfg_batch_address for the property value
+    pub fn mfg_batch_address(&self) -> &str {
+        &self.mfg_batch_address
     }
 
     /// Returns the property_name for the property value
@@ -307,8 +307,8 @@ impl PropertyValue {
 /// Builder used to create a PropertyValue
 #[derive(Default, Clone)]
 pub struct PropertyValueBuilder {
-    product_id: String,
-    product_address: String,
+    mfg_batch_id: String,
+    mfg_batch_address: String,
     property_name: String,
     data_type: String,
     bytes_value: Option<Vec<u8>>,
@@ -324,15 +324,15 @@ pub struct PropertyValueBuilder {
 }
 
 impl PropertyValueBuilder {
-    /// Sets the product ID for this property value
-    pub fn with_product_id(mut self, product_id: String) -> Self {
-        self.product_id = product_id;
+    /// Sets the mfg_batch ID for this property value
+    pub fn with_mfg_batch_id(mut self, mfg_batch_id: String) -> Self {
+        self.mfg_batch_id = mfg_batch_id;
         self
     }
 
-    /// Sets the product address for this property value
-    pub fn with_product_address(mut self, product_address: String) -> Self {
-        self.product_address = product_address;
+    /// Sets the mfg_batch address for this property value
+    pub fn with_mfg_batch_address(mut self, mfg_batch_address: String) -> Self {
+        self.mfg_batch_address = mfg_batch_address;
         self
     }
 
@@ -408,10 +408,10 @@ impl PropertyValueBuilder {
         self
     }
 
-    pub fn build(self) -> Result<PropertyValue, ProductBuilderError> {
+    pub fn build(self) -> Result<PropertyValue, MfgBatchBuilderError> {
         let PropertyValueBuilder {
-            product_id,
-            product_address,
+            mfg_batch_id,
+            mfg_batch_address,
             property_name,
             data_type,
             bytes_value,
@@ -426,45 +426,45 @@ impl PropertyValueBuilder {
             service_id,
         } = self;
 
-        if product_id.is_empty() {
-            return Err(ProductBuilderError::MissingRequiredField(
-                "Missing product_id".to_string(),
+        if mfg_batch_id.is_empty() {
+            return Err(MfgBatchBuilderError::MissingRequiredField(
+                "Missing mfg_batch_id".to_string(),
             ));
         };
 
-        if product_address.is_empty() {
-            return Err(ProductBuilderError::MissingRequiredField(
-                "Missing product_address".to_string(),
+        if mfg_batch_address.is_empty() {
+            return Err(MfgBatchBuilderError::MissingRequiredField(
+                "Missing mfg_batch_address".to_string(),
             ));
         };
 
         if property_name.is_empty() {
-            return Err(ProductBuilderError::MissingRequiredField(
-                "Missing product_name".to_string(),
+            return Err(MfgBatchBuilderError::MissingRequiredField(
+                "Missing mfg_batch_name".to_string(),
             ));
         };
 
         if data_type.is_empty() {
-            return Err(ProductBuilderError::MissingRequiredField(
+            return Err(MfgBatchBuilderError::MissingRequiredField(
                 "Missing data_type".to_string(),
             ));
         };
 
         if start_commit_num >= end_commit_num {
-            return Err(ProductBuilderError::MissingRequiredField(
+            return Err(MfgBatchBuilderError::MissingRequiredField(
                 "start_commit_number must be less than end_commit_num".to_string(),
             ));
         };
 
         if end_commit_num <= start_commit_num {
-            return Err(ProductBuilderError::MissingRequiredField(
+            return Err(MfgBatchBuilderError::MissingRequiredField(
                 "end_commit_number must be greater than start_commit_num".to_string(),
             ));
         };
 
         Ok(PropertyValue {
-            product_id,
-            product_address,
+            mfg_batch_id,
+            mfg_batch_address,
             property_name,
             data_type,
             bytes_value,
@@ -482,22 +482,22 @@ impl PropertyValueBuilder {
 }
 
 #[derive(Debug, Clone)]
-pub struct ProductList {
-    data: Vec<Product>,
+pub struct MfgBatchList {
+    data: Vec<MfgBatch>,
     paging: Paging,
 }
 
-impl ProductList {
-    pub fn new(data: Vec<Product>, paging: Paging) -> Self {
+impl MfgBatchList {
+    pub fn new(data: Vec<MfgBatch>, paging: Paging) -> Self {
         Self { data, paging }
     }
 
-    /// Returns the data for the product list
-    pub fn data(&self) -> Vec<Product> {
+    /// Returns the data for the mfg_batch list
+    pub fn data(&self) -> Vec<MfgBatch> {
         self.data.to_vec()
     }
 
-    /// Returns the paging information for the product list
+    /// Returns the paging information for the mfg_batch list
     pub fn paging(&self) -> &Paging {
         &self.paging
     }
@@ -509,106 +509,106 @@ pub struct LatLongValue {
     pub longitude: i64,
 }
 
-pub trait ProductStore {
-    /// Adds a product to the underlying storage
+pub trait MfgBatchStore {
+    /// Adds a mfg_batch to the underlying storage
     ///
     /// # Arguments
     ///
-    ///  * `product` - The product to be added
-    fn add_product(&self, product: Product) -> Result<(), ProductStoreError>;
+    ///  * `mfg_batch` - The mfg_batch to be added
+    fn add_mfg_batch(&self, mfg_batch: MfgBatch) -> Result<(), MfgBatchStoreError>;
 
-    /// Gets a product from the underlying storage
+    /// Gets a mfg_batch from the underlying storage
     ///
     /// # Arguments
     ///
-    ///  * `product_id` - The ID of the product to be fetched
-    ///  * `service_id` - The service ID to fetch the product for
-    fn get_product(
+    ///  * `mfg_batch_id` - The ID of the mfg_batch to be fetched
+    ///  * `service_id` - The service ID to fetch the mfg_batch for
+    fn get_mfg_batch(
         &self,
-        product_id: &str,
+        mfg_batch_id: &str,
         service_id: Option<&str>,
-    ) -> Result<Option<Product>, ProductStoreError>;
+    ) -> Result<Option<MfgBatch>, MfgBatchStoreError>;
 
-    /// Gets a list of products from the underlying storage
+    /// Gets a list of mfg_batchs from the underlying storage
     ///
     /// # Arguments
     ///
-    ///  * `service_id` - The service ID to fetch the product for
+    ///  * `service_id` - The service ID to fetch the mfg_batch for
     ///  * `offset` - The index of the first in storage to retrieve
     ///  * `limit` - The number of items to retrieve from the offset
-    fn list_products(
+    fn list_mfg_batchs(
         &self,
         service_id: Option<&str>,
         offset: i64,
         limit: i64,
-    ) -> Result<ProductList, ProductStoreError>;
+    ) -> Result<MfgBatchList, MfgBatchStoreError>;
 
-    /// Updates a product in the underlying storage
+    /// Updates a mfg_batch in the underlying storage
     ///
     /// # Arguments
     ///
-    ///  * `product` - The updated product
-    ///  * `service_id` - The service ID to fetch the product for
+    ///  * `mfg_batch` - The updated mfg_batch
+    ///  * `service_id` - The service ID to fetch the mfg_batch for
     ///  * `current_commit_num` - The current commit height
-    fn update_product(
+    fn update_mfg_batch(
         &self,
-        product_id: &str,
+        mfg_batch_id: &str,
         service_id: Option<&str>,
         current_commit_num: i64,
-    ) -> Result<(), ProductStoreError>;
+    ) -> Result<(), MfgBatchStoreError>;
 
-    /// Deletes a product from the underlying storage
+    /// Deletes a mfg_batch from the underlying storage
     ///
     /// # Arguments
     ///
     ///  * `address` - The address of the record to be deleted
     ///  * `current_commit_num` - The current commit height
-    fn delete_product(
+    fn delete_mfg_batch(
         &self,
         address: &str,
         current_commit_num: i64,
-    ) -> Result<(), ProductStoreError>;
+    ) -> Result<(), MfgBatchStoreError>;
 }
 
-impl<PS> ProductStore for Box<PS>
+impl<PS> MfgBatchStore for Box<PS>
 where
-    PS: ProductStore + ?Sized,
+    PS: MfgBatchStore + ?Sized,
 {
-    fn add_product(&self, product: Product) -> Result<(), ProductStoreError> {
-        (**self).add_product(product)
+    fn add_mfg_batch(&self, mfg_batch: MfgBatch) -> Result<(), MfgBatchStoreError> {
+        (**self).add_mfg_batch(mfg_batch)
     }
 
-    fn get_product(
+    fn get_mfg_batch(
         &self,
-        product_id: &str,
+        mfg_batch_id: &str,
         service_id: Option<&str>,
-    ) -> Result<Option<Product>, ProductStoreError> {
-        (**self).get_product(product_id, service_id)
+    ) -> Result<Option<MfgBatch>, MfgBatchStoreError> {
+        (**self).get_mfg_batch(mfg_batch_id, service_id)
     }
 
-    fn list_products(
+    fn list_mfg_batchs(
         &self,
         service_id: Option<&str>,
         offset: i64,
         limit: i64,
-    ) -> Result<ProductList, ProductStoreError> {
-        (**self).list_products(service_id, offset, limit)
+    ) -> Result<MfgBatchList, MfgBatchStoreError> {
+        (**self).list_mfg_batchs(service_id, offset, limit)
     }
 
-    fn update_product(
+    fn update_mfg_batch(
         &self,
-        product_id: &str,
+        mfg_batch_id: &str,
         service_id: Option<&str>,
         current_commit_num: i64,
-    ) -> Result<(), ProductStoreError> {
-        (**self).update_product(product_id, service_id, current_commit_num)
+    ) -> Result<(), MfgBatchStoreError> {
+        (**self).update_mfg_batch(mfg_batch_id, service_id, current_commit_num)
     }
 
-    fn delete_product(
+    fn delete_mfg_batch(
         &self,
         address: &str,
         current_commit_num: i64,
-    ) -> Result<(), ProductStoreError> {
-        (**self).delete_product(address, current_commit_num)
+    ) -> Result<(), MfgBatchStoreError> {
+        (**self).delete_mfg_batch(address, current_commit_num)
     }
 }

@@ -12,167 +12,167 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub(in crate::product) mod models;
+pub(in crate::mfg_batch) mod models;
 mod operations;
 pub(in crate) mod schema;
 
 use crate::error::ResourceTemporarilyUnavailableError;
 
 use operations::{
-    add_product::AddProductOperation, delete_product::DeleteProductOperation,
-    get_product::GetProductOperation, list_products::ListProductsOperation,
-    update_product::UpdateProductOperation, ProductStoreOperations,
+    add_mfg_batch::AddMfgBatchOperation, delete_mfg_batch::DeleteMfgBatchOperation,
+    get_mfg_batch::GetMfgBatchOperation, list_mfg_batches::ListMfgBatchsOperation,
+    update_mfg_batch::UpdateMfgBatchOperation, MfgBatchStoreOperations,
 };
 
 use diesel::connection::AnsiTransactionManager;
 use diesel::r2d2::{ConnectionManager, Pool};
 
-use super::{Product, ProductList, ProductStore, ProductStoreError};
+use super::{MfgBatch, MfgBatchList, MfgBatchStore, MfgBatchStoreError};
 
 #[derive(Clone)]
-pub struct DieselProductStore<C: diesel::Connection + 'static> {
+pub struct DieselMfgBatchStore<C: diesel::Connection + 'static> {
     connection_pool: Pool<ConnectionManager<C>>,
 }
 
-impl<C: diesel::Connection> DieselProductStore<C> {
+impl<C: diesel::Connection> DieselMfgBatchStore<C> {
     pub fn new(connection_pool: Pool<ConnectionManager<C>>) -> Self {
-        DieselProductStore { connection_pool }
+        DieselMfgBatchStore { connection_pool }
     }
 }
 
 #[cfg(feature = "postgres")]
-impl ProductStore for DieselProductStore<diesel::pg::PgConnection> {
-    fn add_product(&self, product: Product) -> Result<(), ProductStoreError> {
-        ProductStoreOperations::new(&*self.connection_pool.get().map_err(|err| {
-            ProductStoreError::ResourceTemporarilyUnavailableError(
+impl MfgBatchStore for DieselMfgBatchStore<diesel::pg::PgConnection> {
+    fn add_mfg_batch(&self, mfg_batch: MfgBatch) -> Result<(), MfgBatchStoreError> {
+        MfgBatchStoreOperations::new(&*self.connection_pool.get().map_err(|err| {
+            MfgBatchStoreError::ResourceTemporarilyUnavailableError(
                 ResourceTemporarilyUnavailableError::from_source(Box::new(err)),
             )
         })?)
-        .add_product(product)
+        .add_mfg_batch(mfg_batch)
     }
 
-    fn get_product(
+    fn get_mfg_batch(
         &self,
-        product_id: &str,
+        mfg_batch_id: &str,
         service_id: Option<&str>,
-    ) -> Result<Option<Product>, ProductStoreError> {
-        ProductStoreOperations::new(&*self.connection_pool.get().map_err(|err| {
-            ProductStoreError::ResourceTemporarilyUnavailableError(
+    ) -> Result<Option<MfgBatch>, MfgBatchStoreError> {
+        MfgBatchStoreOperations::new(&*self.connection_pool.get().map_err(|err| {
+            MfgBatchStoreError::ResourceTemporarilyUnavailableError(
                 ResourceTemporarilyUnavailableError::from_source(Box::new(err)),
             )
         })?)
-        .get_product(product_id, service_id)
+        .get_mfg_batch(mfg_batch_id, service_id)
     }
 
-    fn list_products(
+    fn list_mfg_batches(
         &self,
         service_id: Option<&str>,
         offset: i64,
         limit: i64,
-    ) -> Result<ProductList, ProductStoreError> {
-        ProductStoreOperations::new(&*self.connection_pool.get().map_err(|err| {
-            ProductStoreError::ResourceTemporarilyUnavailableError(
+    ) -> Result<MfgBatchList, MfgBatchStoreError> {
+        MfgBatchStoreOperations::new(&*self.connection_pool.get().map_err(|err| {
+            MfgBatchStoreError::ResourceTemporarilyUnavailableError(
                 ResourceTemporarilyUnavailableError::from_source(Box::new(err)),
             )
         })?)
-        .list_products(service_id, offset, limit)
+        .list_mfg_batches(service_id, offset, limit)
     }
 
-    fn update_product(
+    fn update_mfg_batch(
         &self,
-        product_id: &str,
+        mfg_batch_id: &str,
         service_id: Option<&str>,
         current_commit_num: i64,
-    ) -> Result<(), ProductStoreError> {
-        ProductStoreOperations::new(&*self.connection_pool.get().map_err(|err| {
-            ProductStoreError::ResourceTemporarilyUnavailableError(
+    ) -> Result<(), MfgBatchStoreError> {
+        MfgBatchStoreOperations::new(&*self.connection_pool.get().map_err(|err| {
+            MfgBatchStoreError::ResourceTemporarilyUnavailableError(
                 ResourceTemporarilyUnavailableError::from_source(Box::new(err)),
             )
         })?)
-        .update_product(product_id, service_id, current_commit_num)
+        .update_mfg_batch(mfg_batch_id, service_id, current_commit_num)
     }
 
-    fn delete_product(
+    fn delete_mfg_batch(
         &self,
         address: &str,
         current_commit_num: i64,
-    ) -> Result<(), ProductStoreError> {
-        ProductStoreOperations::new(&*self.connection_pool.get().map_err(|err| {
-            ProductStoreError::ResourceTemporarilyUnavailableError(
+    ) -> Result<(), MfgBatchStoreError> {
+        MfgBatchStoreOperations::new(&*self.connection_pool.get().map_err(|err| {
+            MfgBatchStoreError::ResourceTemporarilyUnavailableError(
                 ResourceTemporarilyUnavailableError::from_source(Box::new(err)),
             )
         })?)
-        .delete_product(address, current_commit_num)
+        .delete_mfg_batch(address, current_commit_num)
     }
 }
 
 #[cfg(feature = "sqlite")]
-impl ProductStore for DieselProductStore<diesel::sqlite::SqliteConnection> {
-    fn add_product(&self, product: Product) -> Result<(), ProductStoreError> {
-        ProductStoreOperations::new(&*self.connection_pool.get().map_err(|err| {
-            ProductStoreError::ResourceTemporarilyUnavailableError(
+impl MfgBatchStore for DieselMfgBatchStore<diesel::sqlite::SqliteConnection> {
+    fn add_mfg_batch(&self, mfg_batch: MfgBatch) -> Result<(), MfgBatchStoreError> {
+        MfgBatchStoreOperations::new(&*self.connection_pool.get().map_err(|err| {
+            MfgBatchStoreError::ResourceTemporarilyUnavailableError(
                 ResourceTemporarilyUnavailableError::from_source(Box::new(err)),
             )
         })?)
-        .add_product(product)
+        .add_mfg_batch(mfg_batch)
     }
 
-    fn get_product(
+    fn get_mfg_batch(
         &self,
-        product_id: &str,
+        mfg_batch_id: &str,
         service_id: Option<&str>,
-    ) -> Result<Option<Product>, ProductStoreError> {
-        ProductStoreOperations::new(&*self.connection_pool.get().map_err(|err| {
-            ProductStoreError::ResourceTemporarilyUnavailableError(
+    ) -> Result<Option<MfgBatch>, MfgBatchStoreError> {
+        MfgBatchStoreOperations::new(&*self.connection_pool.get().map_err(|err| {
+            MfgBatchStoreError::ResourceTemporarilyUnavailableError(
                 ResourceTemporarilyUnavailableError::from_source(Box::new(err)),
             )
         })?)
-        .get_product(product_id, service_id)
+        .get_mfg_batch(mfg_batch_id, service_id)
     }
 
-    fn list_products(
+    fn list_mfg_batches(
         &self,
         service_id: Option<&str>,
         offset: i64,
         limit: i64,
-    ) -> Result<ProductList, ProductStoreError> {
-        ProductStoreOperations::new(&*self.connection_pool.get().map_err(|err| {
-            ProductStoreError::ResourceTemporarilyUnavailableError(
+    ) -> Result<MfgBatchList, MfgBatchStoreError> {
+        MfgBatchStoreOperations::new(&*self.connection_pool.get().map_err(|err| {
+            MfgBatchStoreError::ResourceTemporarilyUnavailableError(
                 ResourceTemporarilyUnavailableError::from_source(Box::new(err)),
             )
         })?)
-        .list_products(service_id, offset, limit)
+        .list_mfg_batches(service_id, offset, limit)
     }
 
-    fn update_product(
+    fn update_mfg_batch(
         &self,
-        product_id: &str,
+        mfg_batch_id: &str,
         service_id: Option<&str>,
         current_commit_num: i64,
-    ) -> Result<(), ProductStoreError> {
-        ProductStoreOperations::new(&*self.connection_pool.get().map_err(|err| {
-            ProductStoreError::ResourceTemporarilyUnavailableError(
+    ) -> Result<(), MfgBatchStoreError> {
+        MfgBatchStoreOperations::new(&*self.connection_pool.get().map_err(|err| {
+            MfgBatchStoreError::ResourceTemporarilyUnavailableError(
                 ResourceTemporarilyUnavailableError::from_source(Box::new(err)),
             )
         })?)
-        .update_product(product_id, service_id, current_commit_num)
+        .update_mfg_batch(mfg_batch_id, service_id, current_commit_num)
     }
 
-    fn delete_product(
+    fn delete_mfg_batch(
         &self,
         address: &str,
         current_commit_num: i64,
-    ) -> Result<(), ProductStoreError> {
-        ProductStoreOperations::new(&*self.connection_pool.get().map_err(|err| {
-            ProductStoreError::ResourceTemporarilyUnavailableError(
+    ) -> Result<(), MfgBatchStoreError> {
+        MfgBatchStoreOperations::new(&*self.connection_pool.get().map_err(|err| {
+            MfgBatchStoreError::ResourceTemporarilyUnavailableError(
                 ResourceTemporarilyUnavailableError::from_source(Box::new(err)),
             )
         })?)
-        .delete_product(address, current_commit_num)
+        .delete_mfg_batch(address, current_commit_num)
     }
 }
 
-pub struct DieselConnectionProductStore<'a, C>
+pub struct DieselConnectionMfgBatchStore<'a, C>
 where
     C: diesel::Connection<TransactionManager = AnsiTransactionManager> + 'static,
     C::Backend: diesel::backend::UsesAnsiSavepointSyntax,
@@ -180,102 +180,102 @@ where
     connection: &'a C,
 }
 
-impl<'a, C> DieselConnectionProductStore<'a, C>
+impl<'a, C> DieselConnectionMfgBatchStore<'a, C>
 where
     C: diesel::Connection<TransactionManager = AnsiTransactionManager> + 'static,
     C::Backend: diesel::backend::UsesAnsiSavepointSyntax,
 {
     pub fn new(connection: &'a C) -> Self {
-        DieselConnectionProductStore { connection }
+        DieselConnectionMfgBatchStore { connection }
     }
 }
 
 #[cfg(feature = "postgres")]
-impl<'a> ProductStore for DieselConnectionProductStore<'a, diesel::pg::PgConnection> {
-    fn add_product(&self, product: Product) -> Result<(), ProductStoreError> {
-        ProductStoreOperations::new(self.connection).add_product(product)
+impl<'a> MfgBatchStore for DieselConnectionMfgBatchStore<'a, diesel::pg::PgConnection> {
+    fn add_mfg_batch(&self, mfg_batch: MfgBatch) -> Result<(), MfgBatchStoreError> {
+        MfgBatchStoreOperations::new(self.connection).add_mfg_batch(mfg_batch)
     }
 
-    fn get_product(
+    fn get_mfg_batch(
         &self,
-        product_id: &str,
+        mfg_batch_id: &str,
         service_id: Option<&str>,
-    ) -> Result<Option<Product>, ProductStoreError> {
-        ProductStoreOperations::new(self.connection).get_product(product_id, service_id)
+    ) -> Result<Option<MfgBatch>, MfgBatchStoreError> {
+        MfgBatchStoreOperations::new(self.connection).get_mfg_batch(mfg_batch_id, service_id)
     }
 
-    fn list_products(
+    fn list_mfg_batches(
         &self,
         service_id: Option<&str>,
         offset: i64,
         limit: i64,
-    ) -> Result<ProductList, ProductStoreError> {
-        ProductStoreOperations::new(self.connection).list_products(service_id, offset, limit)
+    ) -> Result<MfgBatchList, MfgBatchStoreError> {
+        MfgBatchStoreOperations::new(self.connection).list_mfg_batches(service_id, offset, limit)
     }
 
-    fn update_product(
+    fn update_mfg_batch(
         &self,
-        product_id: &str,
+        mfg_batch_id: &str,
         service_id: Option<&str>,
         current_commit_num: i64,
-    ) -> Result<(), ProductStoreError> {
-        ProductStoreOperations::new(self.connection).update_product(
-            product_id,
+    ) -> Result<(), MfgBatchStoreError> {
+        MfgBatchStoreOperations::new(self.connection).update_mfg_batch(
+            mfg_batch_id,
             service_id,
             current_commit_num,
         )
     }
 
-    fn delete_product(
+    fn delete_mfg_batch(
         &self,
         address: &str,
         current_commit_num: i64,
-    ) -> Result<(), ProductStoreError> {
-        ProductStoreOperations::new(self.connection).delete_product(address, current_commit_num)
+    ) -> Result<(), MfgBatchStoreError> {
+        MfgBatchStoreOperations::new(self.connection).delete_mfg_batch(address, current_commit_num)
     }
 }
 
 #[cfg(feature = "sqlite")]
-impl<'a> ProductStore for DieselConnectionProductStore<'a, diesel::sqlite::SqliteConnection> {
-    fn add_product(&self, product: Product) -> Result<(), ProductStoreError> {
-        ProductStoreOperations::new(self.connection).add_product(product)
+impl<'a> MfgBatchStore for DieselConnectionMfgBatchStore<'a, diesel::sqlite::SqliteConnection> {
+    fn add_mfg_batch(&self, mfg_batch: MfgBatch) -> Result<(), MfgBatchStoreError> {
+        MfgBatchStoreOperations::new(self.connection).add_mfg_batch(mfg_batch)
     }
 
-    fn get_product(
+    fn get_mfg_batch(
         &self,
-        product_id: &str,
+        mfg_batch_id: &str,
         service_id: Option<&str>,
-    ) -> Result<Option<Product>, ProductStoreError> {
-        ProductStoreOperations::new(self.connection).get_product(product_id, service_id)
+    ) -> Result<Option<MfgBatch>, MfgBatchStoreError> {
+        MfgBatchStoreOperations::new(self.connection).get_mfg_batch(mfg_batch_id, service_id)
     }
 
-    fn list_products(
+    fn list_mfg_batches(
         &self,
         service_id: Option<&str>,
         offset: i64,
         limit: i64,
-    ) -> Result<ProductList, ProductStoreError> {
-        ProductStoreOperations::new(self.connection).list_products(service_id, offset, limit)
+    ) -> Result<MfgBatchList, MfgBatchStoreError> {
+        MfgBatchStoreOperations::new(self.connection).list_mfg_batches(service_id, offset, limit)
     }
 
-    fn update_product(
+    fn update_mfg_batch(
         &self,
-        product_id: &str,
+        mfg_batch_id: &str,
         service_id: Option<&str>,
         current_commit_num: i64,
-    ) -> Result<(), ProductStoreError> {
-        ProductStoreOperations::new(self.connection).update_product(
-            product_id,
+    ) -> Result<(), MfgBatchStoreError> {
+        MfgBatchStoreOperations::new(self.connection).update_mfg_batch(
+            mfg_batch_id,
             service_id,
             current_commit_num,
         )
     }
 
-    fn delete_product(
+    fn delete_mfg_batch(
         &self,
         address: &str,
         current_commit_num: i64,
-    ) -> Result<(), ProductStoreError> {
-        ProductStoreOperations::new(self.connection).delete_product(address, current_commit_num)
+    ) -> Result<(), MfgBatchStoreError> {
+        MfgBatchStoreOperations::new(self.connection).delete_mfg_batch(address, current_commit_num)
     }
 }

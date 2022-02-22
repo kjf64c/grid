@@ -21,43 +21,43 @@ use crate::error::{ConstraintViolationError, InternalError, ResourceTemporarilyU
 
 /// Represents Store errors
 #[derive(Debug)]
-pub enum ProductStoreError {
+pub enum MfgBatchStoreError {
     InternalError(InternalError),
     ConstraintViolationError(ConstraintViolationError),
     ResourceTemporarilyUnavailableError(ResourceTemporarilyUnavailableError),
     NotFoundError(String),
 }
 
-impl Error for ProductStoreError {
+impl Error for MfgBatchStoreError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         match self {
-            ProductStoreError::InternalError(err) => Some(err),
-            ProductStoreError::ConstraintViolationError(err) => Some(err),
-            ProductStoreError::ResourceTemporarilyUnavailableError(err) => Some(err),
-            ProductStoreError::NotFoundError(_) => None,
+            MfgBatchStoreError::InternalError(err) => Some(err),
+            MfgBatchStoreError::ConstraintViolationError(err) => Some(err),
+            MfgBatchStoreError::ResourceTemporarilyUnavailableError(err) => Some(err),
+            MfgBatchStoreError::NotFoundError(_) => None,
         }
     }
 }
 
-impl fmt::Display for ProductStoreError {
+impl fmt::Display for MfgBatchStoreError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            ProductStoreError::InternalError(err) => err.fmt(f),
-            ProductStoreError::ConstraintViolationError(err) => err.fmt(f),
-            ProductStoreError::ResourceTemporarilyUnavailableError(err) => err.fmt(f),
-            ProductStoreError::NotFoundError(ref s) => write!(f, "Element not found: {}", s),
+            MfgBatchStoreError::InternalError(err) => err.fmt(f),
+            MfgBatchStoreError::ConstraintViolationError(err) => err.fmt(f),
+            MfgBatchStoreError::ResourceTemporarilyUnavailableError(err) => err.fmt(f),
+            MfgBatchStoreError::NotFoundError(ref s) => write!(f, "Element not found: {}", s),
         }
     }
 }
 
 #[cfg(feature = "diesel")]
-impl From<diesel::result::Error> for ProductStoreError {
+impl From<diesel::result::Error> for MfgBatchStoreError {
     fn from(err: diesel::result::Error) -> Self {
         match err {
             diesel::result::Error::DatabaseError(
                 diesel::result::DatabaseErrorKind::UniqueViolation,
                 _,
-            ) => ProductStoreError::ConstraintViolationError(
+            ) => MfgBatchStoreError::ConstraintViolationError(
                 ConstraintViolationError::from_source_with_violation_type(
                     ConstraintViolationType::Unique,
                     Box::new(err),
@@ -66,21 +66,21 @@ impl From<diesel::result::Error> for ProductStoreError {
             diesel::result::Error::DatabaseError(
                 diesel::result::DatabaseErrorKind::ForeignKeyViolation,
                 _,
-            ) => ProductStoreError::ConstraintViolationError(
+            ) => MfgBatchStoreError::ConstraintViolationError(
                 ConstraintViolationError::from_source_with_violation_type(
                     ConstraintViolationType::ForeignKey,
                     Box::new(err),
                 ),
             ),
-            _ => ProductStoreError::InternalError(InternalError::from_source(Box::new(err))),
+            _ => MfgBatchStoreError::InternalError(InternalError::from_source(Box::new(err))),
         }
     }
 }
 
 #[cfg(feature = "diesel")]
-impl From<diesel::r2d2::PoolError> for ProductStoreError {
-    fn from(err: diesel::r2d2::PoolError) -> ProductStoreError {
-        ProductStoreError::ResourceTemporarilyUnavailableError(
+impl From<diesel::r2d2::PoolError> for MfgBatchStoreError {
+    fn from(err: diesel::r2d2::PoolError) -> MfgBatchStoreError {
+        MfgBatchStoreError::ResourceTemporarilyUnavailableError(
             ResourceTemporarilyUnavailableError::from_source(Box::new(err)),
         )
     }
@@ -88,30 +88,30 @@ impl From<diesel::r2d2::PoolError> for ProductStoreError {
 
 /// Represents ProductBuilder errors
 #[derive(Debug)]
-pub enum ProductBuilderError {
+pub enum MfgBatchBuilderError {
     /// Returned when a required field was not set
     MissingRequiredField(String),
-    /// Returned when an error occurs building the product
+    /// Returned when an error occurs building the mfg_batch
     BuildError(Box<dyn Error>),
 }
 
-impl Error for ProductBuilderError {
+impl Error for MfgBatchBuilderError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         match self {
-            ProductBuilderError::MissingRequiredField(_) => None,
-            ProductBuilderError::BuildError(err) => Some(&**err),
+            MfgBatchBuilderError::MissingRequiredField(_) => None,
+            MfgBatchBuilderError::BuildError(err) => Some(&**err),
         }
     }
 }
 
-impl fmt::Display for ProductBuilderError {
+impl fmt::Display for MfgBatchBuilderError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            ProductBuilderError::MissingRequiredField(ref s) => {
-                write!(f, "failed to build product: {}", s)
+            MfgBatchBuilderError::MissingRequiredField(ref s) => {
+                write!(f, "failed to build mfg_batch: {}", s)
             }
-            ProductBuilderError::BuildError(ref s) => {
-                write!(f, "failed to build product: {}", s)
+            MfgBatchBuilderError::BuildError(ref s) => {
+                write!(f, "failed to build mfg_batch: {}", s)
             }
         }
     }
